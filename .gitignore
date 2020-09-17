@@ -13,12 +13,14 @@
 analysis/*.html
 analysis/*.docx
 analysis/*.pdf
-reports/*.html
 reports/*.docx
 reports/*.pdf
 
 # output files
 output/
+
+# data files
+data/
 
 # knitr and R markdown default cache directories
 /analysis/cache/
