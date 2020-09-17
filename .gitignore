@@ -1,0 +1,50 @@
+# History files
+.Rhistory
+.Rapp.history
+
+# Session Data files
+.RData
+.RDataTmp
+
+# RStudio files
+.Rproj.user/
+
+# Rendered reports
+analysis/*.html
+analysis/*.docx
+analysis/*.pdf
+reports/*.html
+reports/*.docx
+reports/*.pdf
+
+# output files
+output/
+
+# knitr and R markdown default cache directories
+/analysis/cache/
+/analysis/figures/
+
+# Temporary files created by R markdown
+*.utf8.md
+*.knit.md
+
+# RStudio
+.Rproj.user
+.RProfile
+
+# Tableau temp files
+*.twbr
+
+# Python temp files
+__pycache__
+*.pytest_cache/
+
+# Jupyter temp files
+.ipynb_checkpoints
+
+# Python security check temp db
+safety-db
+
+# OS specific files
+.DS_Store
+Thumbs.db
