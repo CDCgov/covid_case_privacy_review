@@ -12,9 +12,9 @@ report_dir = "../reports"
 data_dir = "../data/raw"
 
 # change these depending on the data set...
-report_file_name <- "COVID_Cases_Public_Limited_08312020_profile.html"
-report_title <- "COVID-19 Case Surveillance Public Use Data Profile (2020-08-31 version)"
-file_name <- "COVID_Cases_Public_Limited_08312020.csv"
+report_file_name <- "New_Public_08312020_profile.html"
+report_title <- "COVID-19 Case Surveillance Public Use Data Profile (2020-08-31 planning version)"
+file_name <- "New_Public_08312020.csv"
 detailed_file_name <- paste(data_dir,"/",file_name,sep="")
 
 cat("Processing file:", detailed_file_name,"\n\n")

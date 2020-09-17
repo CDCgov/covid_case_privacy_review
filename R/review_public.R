@@ -15,16 +15,19 @@ report_dir = "../reports"
 out_dir = "../output"
 data_dir = "../data/raw"
 
-KANON_LEVEL <- 5
+KANON_LEVEL_LOCATION <- 100
+KANON_LEVEL_LOCATION
+KANON_LEVEL <- 25
 KANON_LEVEL
 LDIV_LEVEL <- 2
 LDIV_LEVEL
 
-quasi_identifiers = c("race_ethnicity_combined","sex","age_group")
-confidential_attributes = c("pos_spec_dt")
+location_quasi_identifiers = c("res_county","res_state","state")
+quasi_identifiers = c(location_quasi_identifiers, "age_group","sex","race_ethnicity_combined","healthdept","hc_work_yn","translator_yn","housing","exp_ship")
+confidential_attributes = c("pos_spec_dt","death_week")
 
 #data folder symlinked to data
-file_name <- "COVID_Cases_Public_Limited_08312020.csv"
+file_name <- "New_Public_08312020.csv"
 suppressed_file_name = paste(out_dir,"/",file_name,".suppressed.csv",sep="")
 detailed_file_name = paste(data_dir,"/",file_name,sep="")
 print(detailed_file_name)
@@ -46,7 +49,29 @@ for (qi in quasi_identifiers){
   data[[qi]] <- as.factor(data[[qi]])
 }
 
+# review for locations first
+
 ## Set up sdcMicro object
+sdcObj <- createSdcObj(dat=data,
+                       keyVars=location_quasi_identifiers,
+                       numVars=NULL,
+                       weightVar=NULL,
+                       hhId=NULL,
+                       strataVar=NULL,
+                       pramVars=NULL,
+                       excludeVars=NULL,
+                       seed=0,
+                       randomizeRecords=FALSE,
+                       alpha=c(0))
+
+# print to confirm observations, num variables, quasis, quasi describes, and risk info
+sdc_print(sdcObj, KANON_LEVEL_LOCATION)
+
+#should be zero
+fk = summarize_violations(data, sdcObj, KANON_LEVEL_LOCATION, location_quasi_identifiers)
+
+#now lets check for k-anonymity using full quasi-identifier set
+
 sdcObj <- createSdcObj(dat=data,
                        keyVars=quasi_identifiers,
                        numVars=NULL,
@@ -62,8 +87,8 @@ sdcObj <- createSdcObj(dat=data,
 # print to confirm observations, num variales, quasis, quasi describes, and risk info
 sdc_print(sdcObj, KANON_LEVEL)
 
-#should be zero
-fk = summarize_violations(data, sdcObj, KANON_LEVEL, quasi_identifiers)
+#this should be zero
+fk <- summarize_violations(data, sdcObj, KANON_LEVEL, quasi_identifiers)
 
 # not actually performing suppression, but if needed to help debug uncomment below to generate an sdcmicro suppressed file
 #sdcObj <- kAnon(sdcObj, importance=c(2,1), combs=NULL, k=c(KANON_LEVEL))

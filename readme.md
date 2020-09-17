@@ -18,23 +18,38 @@ These thresholds are applied to the quasi-identifiers and confidential variables
 
 We are working to improve these privacy procedures over time and welcome feedback and improvements submitted to this project as issues or pull requests.
 
-### Data file characteristics
+## Data file characteristics
 
-The public use data file checks its 11 variables for...
+The public use data file checks its 96 variables for...
 
-#### Quasi-identifiers (3)
+### Quasi-identifiers (11)
 
-Checked for k=5
+Checked for k=100
 
-* age_group
-* sex
-* raceethnicity_combined
+* state - Reporting jurisdiction
+* res_state – State of Residence
+* res_county – County of Residence
 
-#### Confidential attributes (1)
+Checked for k=25
 
-* pos_spec_dt
+* state - Reporting jurisdiction
+* res_state – State of Residence
+* res_county – County of Residence
+* age_group 
+* sex 
+* race_ethnicity_combined 
+* healthdept - name of health department, contains geography 
+* hc_work_yn - Is the patient a health care worker in the United States? 
+* translator_yn - If hospitalized, was a translator required? 
+* housing - type of housing
+* exp_ship - exposure on ship of vessel as crew or passenger
 
-Checked for l=2
+### Confidential attributes (2)
+
+Checked for l=2 against all 11 quasi-identifiers
+
+* pos_spec_dt - date of first positive specimen collection
+* death_week - calculated from death_dt that was excluded for identification purposes
 
 ## Run procedures
 
@@ -42,13 +57,13 @@ To run these scripts, copy in or symlik a data file to the `data/raw` folder, up
 
 ## Interpreting output
 
-This script uses the [sdcMicro]() package so much of the output is generated from this package. What we look for is the specific output `k-anon violations ( 0 )` and `< 0 > l-diversity violations`. If any violations are found then the file is not ready for publication, notify the data team so they can fix the data pipeline.
+This script uses the [sdcMicro](https://cran.r-project.org/web/packages/sdcMicro/) package so much of the output is generated from this package. What we look for is the specific output `k-anon violations ( 0 )` and `< 0 > l-diversity violations`. If any violations are found then the file is not ready for publication, notify the data team so they can fix the data pipeline.
 
 For convenience, a portion of this output is stored in `reports/log.md` to compare results on previous versions of the dataset.
 
 ## Helper scripts
 
-This project also includes a script called `profile_data.R` that uses the [DataExplorer]() package to create a profile report that is helpful for understanding and debugging the dataset. If you run it, it will output a new profile to the `reports` folder.
+This project also includes a script called `profile_data.R` that uses the [DataExplorer](https://www.rdocumentation.org/packages/DataExplorer/versions/0.8.1) package to create a profile report that is helpful for understanding and debugging the dataset. If you run it, it will output a new profile to the `reports` folder.
 
 ## Required software
 
