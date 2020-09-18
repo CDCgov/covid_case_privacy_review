@@ -22,9 +22,18 @@ KANON_LEVEL
 LDIV_LEVEL <- 2
 LDIV_LEVEL
 
-location_quasi_identifiers = c("res_county","res_state","state")
+location_quasi_identifiers = c("state","res_state","res_county")
 quasi_identifiers = c(location_quasi_identifiers, "age_group","sex","race_ethnicity_combined","healthdept","hc_work_yn","translator_yn","housing","exp_ship")
 confidential_attributes = c("pos_spec_dt","death_week")
+#in some cases where attributes are related, we want to suppress the linked attribute whenever the source is suppressed. Using this format as that's what sdcmicro expects for ghostVars
+linked_attributes = list(
+  list("state",c("healthdept")),
+  list("res_state",c("healthdept")),
+  list("res_county",c("healthdept"))
+  )
+
+all.equal(ghostVars,ghostVars2)
+all.equal(ghostVars,ghostVars3)
 
 #data folder symlinked to data
 file_name <- "New_Public_08312020.csv"
@@ -37,16 +46,19 @@ data = read.csv(detailed_file_name, fileEncoding="UTF-8-BOM")
 #summarize existing suppressions
 summarize_suppression(data, quasi_identifiers)
 
-#to check for ldiversity, let's recode blank confidential attributes to NA
-for (ca in confidential_attributes){
-  data[[ca]][data[[ca]] == ''] <- NA
-}
-
-# It seems like ldiv doesn't calculate properly with quasi-identifiers that are NA, so I set them to a blank string so they group, this shouldn't matter for terms of k-anon as long as alpha is 0
-for (qi in quasi_identifiers){
-  data[[qi]] <- as.character(data[[qi]])
-  data[[qi]][is.na(data[[qi]])] <- ''
-  data[[qi]] <- as.factor(data[[qi]])
+cat('Processing checks for linked fields (',unlist(linked_attributes),')')
+for (link in linked_attributes){
+  source_field = link[[1]]
+  linked_fields = link[[2]]
+  for (linked_field in linked_fields){
+    link_violations = subset(data, is.na(data[[source_field]]) & !is.na(data[[linked_field]]))
+    num_v = nrow(link_violations)
+    cat("linked variable violations (",num_v,") for source_field=(",source_field,") and linked_field=(",linked_field,"). If greater than zero violations then here's 5 violations.\n")
+    if (num_v > 0){
+      print(link_violations[,c(source_field,linked_field)][sample(nrow(link_violations),5),])
+    }
+    cat("\n\n")
+  }
 }
 
 # review for locations first
@@ -62,7 +74,8 @@ sdcObj <- createSdcObj(dat=data,
                        excludeVars=NULL,
                        seed=0,
                        randomizeRecords=FALSE,
-                       alpha=c(0))
+                       alpha=c(0),
+                       ghostVars = linked_attributes)
 
 # print to confirm observations, num variables, quasis, quasi describes, and risk info
 sdc_print(sdcObj, KANON_LEVEL_LOCATION)
@@ -100,6 +113,19 @@ report(sdcObj, outdir = report_dir, filename = file_name,
        title = "SRRG Privacy Evaluation Report for Case Surveillance Public Data Set", internal = TRUE, verbose = FALSE)
 
 cat('Processing l-diversity (',LDIV_LEVEL,') checks for <',detailed_file_name,'> that has <',nrow(data),'> records; <',ncol(data),'> variables; <',length(quasi_identifiers),'> quasi-identifiers (',quasi_identifiers,'); and <',length(confidential_attributes),'> confidential attributes (',confidential_attributes,').\n' )
+
+#to check for ldiversity, let's recode blank confidential attributes to NA
+for (ca in confidential_attributes){
+  data[[ca]][data[[ca]] == ''] <- NA
+}
+
+# It seems like ldiv doesn't calculate properly with quasi-identifiers that are NA, so I set them to a blank string so they group, this shouldn't matter for terms of k-anon as long as alpha is 0
+for (qi in quasi_identifiers){
+  data[[qi]] <- as.character(data[[qi]])
+  data[[qi]][is.na(data[[qi]])] <- ''
+  data[[qi]] <- as.factor(data[[qi]])
+}
+
 for (ca in confidential_attributes){
   ldiv_or = ldiversity_hack(cbind(data, fk),ca)
   ldiv_violations <- subset(ldiv_or, ldiv < LDIV_LEVEL)

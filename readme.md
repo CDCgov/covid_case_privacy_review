@@ -57,7 +57,7 @@ To run these scripts, copy in or symlik a data file to the `data/raw` folder, up
 
 ## Interpreting output
 
-This script uses the [sdcMicro](https://cran.r-project.org/web/packages/sdcMicro/) package so much of the output is generated from this package. What we look for is the specific output `k-anon violations ( 0 )` and `< 0 > l-diversity violations`. If any violations are found then the file is not ready for publication, notify the data team so they can fix the data pipeline.
+This script uses the [sdcMicro](https://cran.r-project.org/web/packages/sdcMicro/) package so much of the output is generated from this package. What we look for is the specific output `linked variable violations ( 20 )`, `k-anon violations ( 0 )`, and `< 0 > l-diversity violations`. If any violations are found then the file is not ready for publication, notify the data team so they can fix the data pipeline.
 
 For convenience, a portion of this output is stored in `reports/log.md` to compare results on previous versions of the dataset.
 
@@ -81,8 +81,8 @@ These folders are meant to help organize and make it easier for others to unders
 
 ```sh
 ├── R                   <- R scripts
-│   └── review_public.R <- main script to review data file
-│   └── functions.R     <- functions that are reused in other scripts
+│   ├── review_public.R <- main script to review data file
+│   ├── functions.R     <- functions that are reused in other scripts
 │   └── profile_data.R  <- creates a data profile report for exploratory data analysis
 ├── data                <- data files used by project
 │   └── raw             <- raw files, original, immutable data dump
@@ -90,6 +90,7 @@ These folders are meant to help organize and make it easier for others to unders
 ├── output              <- output files
 ├── readme.md           <- Description of project, instructions for how to run
 └── reports             <- Generated reports and visualizations
+    └── log.md          <- logged results from scanned files
 ```
 
 ## References
