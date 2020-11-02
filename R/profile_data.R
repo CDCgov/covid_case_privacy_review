@@ -3,6 +3,7 @@
 
 source("functions.R")
 
+
 library(DataExplorer)
 library(Hmisc)
 library(inspectdf)
@@ -12,9 +13,9 @@ report_dir = "../reports"
 data_dir = "../data/raw"
 
 # change these depending on the data set...
-report_file_name <- "COVID_Cases_Public_Limited_09302020_profile.html"
-report_title <- "COVID-19 Case Surveillance Public Use Data Profile (2020-09-30 version)"
-file_name <- "COVID_Cases_Public_Limited_09302020.csv"
+report_file_name <- "COVID_Cases_Public_Limited_10312020_profile.html"
+report_title <- "COVID-19 Case Surveillance Public Use Data Profile (2020-10-31 version)"
+file_name <- "COVID_Cases_Public_Limited_10312020.csv"
 detailed_file_name <- paste(data_dir,"/",file_name,sep="")
 
 cat("Processing file:", detailed_file_name,"\n\n")
