@@ -100,7 +100,6 @@ The input dataset consists of 5760066 rows and 11 variables.
   --> Categorical key variables: race_ethnicity_combined, sex, age_group
 ----------------------------------------------------------------------
 
-
 Information on categorical key variables:
 
 Reported is the number, mean size and size of the smallest category >0 for recoded variables.

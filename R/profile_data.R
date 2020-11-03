@@ -14,7 +14,7 @@ library(dplyr)
 report_dir = "../reports"
 data_dir = "../data/raw"
 
-# change these depending on the data set...
+# change these depending on the current data set...
 report_file_name <- "COVID_Cases_Public_Limited_10312020_profile.html"
 report_title <- "COVID-19 Case Surveillance Public Use Data Profile (2020-10-31 version)"
 file_name <- "COVID_Cases_Public_Limited_10312020.csv"
