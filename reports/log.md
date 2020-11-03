@@ -114,7 +114,6 @@ Note: NA (missings) are counted as seperate categories!
                age_group                   11 (11) 523642.364 (523642.364)                    92 (92)
 ----------------------------------------------------------------------
 
-
 Risk measures:
 
 Number of observations with higher risk than the main part of the data: 139

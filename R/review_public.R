@@ -23,7 +23,7 @@ LDIV_LEVEL
 quasi_identifiers = c("race_ethnicity_combined","sex","age_group")
 confidential_attributes = c("pos_spec_dt")
 
-#data folder symlinked to data
+#data folder symlinked to data, changed filename to current filename
 file_name <- "COVID_Cases_Public_Limited_10312020.csv"
 suppressed_file_name = paste(out_dir,"/",file_name,".suppressed.csv",sep="")
 detailed_file_name = paste(data_dir,"/",file_name,sep="")

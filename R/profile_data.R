@@ -2,7 +2,9 @@
 # Exploring DataExplorer, Hmisc.describe, inspectdf
 
 source("functions.R")
-
+# DataExplorer is not available in CRAN, need to download from github
+#library(devtools)
+#install_github("boxuancui/DataExplorer")
 
 library(DataExplorer)
 library(Hmisc)
