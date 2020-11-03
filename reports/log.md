@@ -88,6 +88,7 @@ checking l-diversity manually for < pos_spec_dt >, found < 0 > l-diversity viola
 
 [DataExplorer Profile Report](../reports/COVID_Cases_Public_Limited_10312020_profile.html)
 
+```
 [1] "../data/raw/COVID_Cases_Public_Limited_10312020.csv"
 [1] "Existing suppression summary:"
                         na_count na_percent
@@ -125,3 +126,4 @@ checking l-diversity manually for < pos_spec_dt >, found < 0 > l-diversity viola
 [1] race_ethnicity_combined sex                     age_group               pos_spec_dt             fk                     
 [6] ldiv                   
 <0 rows> (or 0-length row.names)
+```
