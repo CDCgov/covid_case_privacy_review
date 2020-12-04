@@ -127,3 +127,46 @@ checking l-diversity manually for < pos_spec_dt >, found < 0 > l-diversity viola
 [6] ldiv                   
 <0 rows> (or 0-length row.names)
 ```
+## 2020-12-04
+
+[DataExplorer Profile Report](../reports/COVID_Cases_Public_Limited_12042020_profile.html)
+
+```
+[1] "../data/raw/COVID_Cases_Public_Limited_11302020.csv"
+[1] "Existing suppression summary:"
+                        na_count na_percent
+race_ethnicity_combined        7      0.00%
+sex                           18      0.00%
+age_group                     89      0.00%
+
+SDC summary for k-anon-level( 5 ).
+
+The input dataset consists of 8405079 rows and 11 variables.
+  --> Categorical key variables: race_ethnicity_combined, sex, age_group
+----------------------------------------------------------------------
+
+Information on categorical key variables:
+
+Reported is the number, mean size and size of the smallest category >0 for recoded variables.
+In parenthesis, the same statistics are shown for the unmodified data.
+Note: NA (missings) are counted as seperate categories!
+
+Key Variable Number of categories        Mean size               Size of smallest (>0)     
+ race_ethnicity_combined                   10 (10)  840507.900  (840507.900)                     7  (7)
+                     sex                    6  (6) 1400846.500 (1400846.500)                    18 (18)
+               age_group                   11 (11)  764098.091  (764098.091)                    89 (89)
+----------------------------------------------------------------------
+
+Risk measures:
+
+Number of observations with higher risk than the main part of the data: 162
+Expected number of re-identifications: 364.00 (0.00 %)
+k-anon violations ( 0 ) for k=( 5 ) and quasi identifiers( race_ethnicity_combined sex age_group ). If greater than zero violations then here's 5 violations.
+
+Writing out a privacy eval report to: ../reports/COVID_Cases_Public_Limited_12042020.csv.html
+Processing l-diversity ( 2 ) checks for < ../data/raw/COVID_Cases_Public_Limited_12042020.csv > that has < 8405079 > records; < 11 > variables; < 3 > quasi-identifiers ( race_ethnicity_combined sex age_group ); and < 1 > confidential attributes ( pos_spec_dt ).
+checking l-diversity manually for < pos_spec_dt >, found < 0 > l-diversity violations.
+[1] race_ethnicity_combined sex                     age_group               pos_spec_dt            
+[5] fk                      ldiv                   
+<0 rows> (or 0-length row.names)
+```
