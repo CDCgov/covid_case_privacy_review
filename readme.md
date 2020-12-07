@@ -28,7 +28,7 @@ Checked for k=5
 
 * age_group
 * sex
-* raceethnicity_combined
+* race_ethnicity_combined
 
 #### Confidential attributes (1)
 
@@ -55,7 +55,7 @@ This project also includes a script called `profile_data.R` that uses the [DataE
 These scripts were developed and tested in R version 4.0.2 using the following packages and versions:
 
 * sdcMicro 5.5.1
-* DataExplorer 0.8.1 (optional for profiling)
+* DataExplorer 0.8.1 (optional for profiling, currently not in CRAN and can be pulled from <https://github.com/boxuancui/DataExplorer/releases/tag/v0.8.1>)
 * Hmisc 4.4-0 (optional for profiling)
 * inspectdf 0.0.8 (optional for profiling)
 * dplyr 1.0.1 (optional for profiling)
@@ -76,6 +76,9 @@ These folders are meant to help organize and make it easier for others to unders
 ├── readme.md           <- Description of project, instructions for how to run
 └── reports             <- Generated reports and visualizations
 ```
+## TODOs
+
+* Investigate using [dlookr](https://cran.r-project.org/web/packages/dlookr/index.html) instead of DataExplorer.
 
 ## References
 
