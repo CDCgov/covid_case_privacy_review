@@ -2,6 +2,20 @@
 
 This project contains the procedures used by the Surveillance Review and Response Group to review and verify that data sets include privacy protection controls and meet the defined k-anonymity and l-diversity thresholds established by the covid response.
 
+## Issues, questions, problems, suggestions
+
+If you have any of the above, please [submit an issue on github](https://github.com/CDCgov/covid_case_privacy_review/issues).
+
+## Requires
+
+* [sdcMicro](https://cran.r-project.org/web/packages/sdcMicro/index.html) version >= 5.5.1
+* R version >= 4.0.3 (although I suspect, but have not tested >=3.5)
+* optional for profiling
+  * [DataExplorer](https://cran.r-project.org/web/packages/DataExplorer/index.html) >=0.8.2
+  * [Hmisc](https://cran.r-project.org/web/packages/Hmisc/index.html) >=4.4-2
+  * [inspectdf](https://cran.r-project.org/web/packages/inspectdf/index.html) >=0.0.9
+  * [dplyr](https://cran.r-project.org/web/packages/dplyr/index.html) >= 1.0.2
+
 ## Description
 
 These scripts are part of a two step process for statistical disclosure control implementation. These scripts do not directly perform suppression or modify any data, but are a separate step to validate that the data generation pipeline- implemented in CDC's Palantir software- generates the data file so that it meets all the privacy protection requirements.
@@ -18,38 +32,48 @@ These thresholds are applied to the quasi-identifiers and confidential variables
 
 We are working to improve these privacy procedures over time and welcome feedback and improvements submitted to this project as issues or pull requests.
 
-## Data file characteristics
-
-The public use data file checks its 96 variables for...
+## Data file characteristics - Public11
 
 ### Quasi-identifiers (11)
 
-Checked for k=100
+Checked for k=5
 
-* state - Reporting jurisdiction
+* age_group 
+* sex 
+* race_ethnicity_combined 
+
+### Confidential attributes
+
+* pos_spec_dt
+
+## Data file charateristics - CountyJan
+
+The public use data file checks its xx variables for...
+
+### Population level
+
+Checking county population and res_county should never be populated if the county population (by fips code) is under 20k.
+
+### Quasi-identifiers (11)
+
+Checked for k=1000
+
 * res_state – State of Residence
 * res_county – County of Residence
 
-Checked for k=25
+Checked for k=11
 
-* state - Reporting jurisdiction
 * res_state – State of Residence
 * res_county – County of Residence
 * age_group 
 * sex 
-* race_ethnicity_combined 
-* healthdept - name of health department, contains geography 
-* hc_work_yn - Is the patient a health care worker in the United States? 
-* translator_yn - If hospitalized, was a translator required? 
-* housing - type of housing
-* exp_ship - exposure on ship of vessel as crew or passenger
+* race_combined
+* ethnicity
+* cdc_report_week (will be replaced by cdc_earliest_week) 
 
-### Confidential attributes (2)
+### Confidential attributes
 
-Checked for l=2 against all 11 quasi-identifiers
-
-* pos_spec_dt - date of first positive specimen collection
-* death_week - calculated from death_dt that was excluded for identification purposes
+Don't think there are any confidential attributes in this data file.
 
 ## Run procedures
 

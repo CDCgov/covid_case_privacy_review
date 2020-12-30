@@ -1,8 +1,12 @@
-# perform a privacy impact review on the covid case surveillance public data file
-# k-anonymity 5 for all quasi-identifiers and l-diversity 2 for all confidential attributes
-# actual supression logic is in DCIPHER contour workflow, this script confirms that files are meeting
-# privacy rules to reduce risk of reidentification
+# perform a privacy impact review on the covid case surveillance public data file with geography
+#   manual suppression for all counties with population < 20,000
+#   k-anonymity 11 for all quasi-identifiers
+#   confirming suppression of linked variables
+#   l-diversity 2 for all confidential
+
+# actual supression logic is in DCIPHER contour workflow, this script confirms that files are meeting privacy rules to reduce risk of reidentification
 # note that this assumes that missing values aren't factored in for k-anon, to make them count as wildcards, adjust the alpha parameter to what percent you want them to count as wildcards
+
 #sdcApp(maxRequestSize = 2000)
 #View(data)
 
@@ -24,11 +28,11 @@ LDIV_LEVEL <- 2
 LDIV_LEVEL
 
 location_quasi_identifiers = c("res_state","res_county")
-quasi_identifiers = c(location_quasi_identifiers, "age_group","sex","race_combined","ethnicity")
+quasi_identifiers = c(location_quasi_identifiers, "age_group","sex","race_combined","ethnicity", "cdc_report_week")
 confidential_attributes = c()
 #in some cases where attributes are related, we want to suppress the linked attribute whenever the source is suppressed. Using this format as that's what sdcmicro expects for ghostVars
 linked_attributes = list(
-  list("res_state",c("res_county","county_fips_code","state_fips_code")),
+  list("res_state",c("county_fips_code","state_fips_code")),
   list("res_county",c("county_fips_code"))
   )
 
@@ -38,7 +42,7 @@ suppressed_file_name = paste(out_dir,"/",file_name,".suppressed.csv",sep="")
 detailed_file_name = paste(data_dir,"/",file_name,sep="")
 print(detailed_file_name)
 
-data = read.csv(detailed_file_name, fileEncoding="UTF-8-BOM")
+data = read.csv(detailed_file_name, fileEncoding="UTF-8-BOM", na.strings=c('NA',''))
 
 #summarize existing suppressions
 summarize_suppression(data, quasi_identifiers)
@@ -88,6 +92,10 @@ sdc_print(sdcObj, KANON_LEVEL)
 
 #this should be zero
 fk <- summarize_violations(data, sdcObj, KANON_LEVEL, quasi_identifiers)
+
+violations <- cbind(data, fk)[sdcObj@risk$individual[,2] < 2,c(quasi_identifiers,"fk")]
+violations[order(violations$fk),]
+nrow(violations)
 
 # not actually performing suppression, but if needed to help debug uncomment below to generate an sdcmicro suppressed file
 #sdcObj <- kAnon(sdcObj, importance=c(2,1), combs=NULL, k=c(KANON_LEVEL))

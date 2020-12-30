@@ -64,3 +64,21 @@ summarize_suppression <- function(data, qis){
   print(suppression_summary)
   cat("\n\n")
 }
+
+#print out info on any linked variable violations. Like if state is suppressed but county isn't. This should never happen, but want to check just in case.
+summarize_linked_attribute_violations <- function(data, linked_attributes){
+  cat('Processing checks for linked fields (',unlist(linked_attributes),')')
+  for (link in linked_attributes){
+    source_field = link[[1]]
+    linked_fields = link[[2]]
+    for (linked_field in linked_fields){
+      link_violations = subset(data, is.na(data[[source_field]]) & !is.na(data[[linked_field]]))
+      num_v = nrow(link_violations)
+      cat("linked variable violations (",num_v,") for source_field=(",source_field,") and linked_field=(",linked_field,"). If greater than zero violations then here's 5 violations.\n")
+      if (num_v > 0){
+        print(link_violations[,c(source_field,linked_field)][sample(nrow(link_violations),5),])
+      }
+      cat("\n\n")
+    }
+  }
+}

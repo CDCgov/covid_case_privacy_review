@@ -32,7 +32,6 @@ data/
 
 # RStudio
 .Rproj.user
-.RProfile
 
 # Tableau temp files
 *.twbr
