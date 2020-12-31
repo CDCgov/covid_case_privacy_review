@@ -15,15 +15,16 @@ report_dir = "../reports"
 data_dir = "../data/raw"
 
 # change these depending on the current data set...
-report_file_name <- "COVID_Cases_Public_Limited_12042020_profile.html"
-report_title <- "COVID-19 Case Surveillance Public Use Data Profile (2020-12-04 version)"
-file_name <- "COVID_Cases_Public_Limited_12042020.csv"
+report_file_name <- "COVID_Cases_Public_Limited_12312020_profile.html"
+report_title <- "COVID-19 Case Surveillance Public Use Data Profile (2020-12-31 version)"
+
+file_name <- "COVID_Cases_Public_Limited_12312020.csv"
 detailed_file_name <- paste(data_dir,"/",file_name,sep="")
 
 cat("Processing file:", detailed_file_name,"\n\n")
 
 # update this depending on the data set
-public_date_fields <- c("pos_spec_dt","onset_dt","cdc_report_dt")
+public_date_fields <- c("pos_spec_dt","onset_dt","cdc_report_dt","cdc_case_earliest_dt")
 date_fields <- public_date_fields
 
 #start the work

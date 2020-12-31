@@ -20,7 +20,7 @@ We are working to improve these privacy procedures over time and welcome feedbac
 
 ### Data file characteristics
 
-The public use data file checks its 11 variables for...
+The public use data file checks its 12 variables for...
 
 #### Quasi-identifiers (3)
 
