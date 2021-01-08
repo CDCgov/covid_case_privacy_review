@@ -28,7 +28,7 @@ LDIV_LEVEL <- 2
 LDIV_LEVEL
 
 location_quasi_identifiers = c("res_state","res_county")
-quasi_identifiers = c(location_quasi_identifiers, "age_group","sex","race_combined","ethnicity", "cdc_report_week")
+quasi_identifiers = c(location_quasi_identifiers, "age_group","sex","race_combined","ethnicity", "cdc_report_month")
 confidential_attributes = c()
 #in some cases where attributes are related, we want to suppress the linked attribute whenever the source is suppressed. Using this format as that's what sdcmicro expects for ghostVars
 linked_attributes = list(
@@ -37,12 +37,13 @@ linked_attributes = list(
   )
 
 #data folder symlinked to data
-file_name <- "modeling_suppression_utility_countyjan.csv"
+file_name <- "modeling_suppression_utility_countyjan_confB.csv"
 suppressed_file_name = paste(out_dir,"/",file_name,".suppressed.csv",sep="")
 detailed_file_name = paste(data_dir,"/",file_name,sep="")
 print(detailed_file_name)
 
 data = read.csv(detailed_file_name, fileEncoding="UTF-8-BOM", na.strings=c('NA',''))
+typeof(data)
 
 #summarize existing suppressions
 summarize_suppression(data, quasi_identifiers)
@@ -98,8 +99,7 @@ violations[order(violations$fk),]
 nrow(violations)
 
 # not actually performing suppression, but if needed to help debug uncomment below to generate an sdcmicro suppressed file
-#sdcObj <- kAnon(sdcObj, importance=c(2,1), combs=NULL, k=c(KANON_LEVEL))
-#sdcObj
+#sdcObj <- kAnon(sdcObj, importance=c(1,1,1,1,1,1,2), combs=NULL, k=c(KANON_LEVEL))
 #writeSafeFile(sdcObj,"csv","simple",suppressed_file_name, quote=FALSE, sep=",",row.names=FALSE)
 
 cat("Writing out a privacy eval report to:", paste(report_dir,"/",file_name,".html",sep = ""),"\n\n")
