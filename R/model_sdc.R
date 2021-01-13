@@ -36,10 +36,15 @@ df = read_parquet(full_file_name, as_data_frame = TRUE)
 #for some reason the dataframe from arrow makes sdc take forever and error, but if I make a new dataframe it works, todo figure it out
 data <- data.frame(df)
 
+#this is temporary to code any NAs as Missing instead of actual NAs, eventually this won't be necessary
+data$res_state[is.na(data$res_state)] <- "Missing"
+data$res_county[is.na(data$res_county)] <- "Missing"
+
 # these are supposed to be coded to Missing
-summarize_suppression(df, quasi_identifiers)
+summarize_suppression(data, quasi_identifiers)
 
 kanon_test_levels = c(1000,2000,3000,4000,5000)
+#kanon_test_levels = c(1000)
 
 ## Set up sdcMicro object
 sdcObj <- createSdcObj(dat=data,
@@ -61,11 +66,18 @@ sdc_print(sdcObj, KANON_LEVEL_LOCATION)
 #should be zero
 fk = summarize_violations(data, sdcObj, KANON_LEVEL_LOCATION, location_quasi_identifiers)
 
-for (i in kanon_test_levels){
-  # print to confirm observations, num variables, quasis, quasi describes, and risk info
-  sdc_print(sdcObj, i)
+#this takes forever with these big datafiles, doing it manually
+#sdcObj <- kAnon(sdcObj, importance=c(1,2), combs=NULL, k=c(KANON_LEVEL_LOCATION))
 
-  #should be zero
-  fk = summarize_violations(data, sdcObj, i, location_quasi_identifiers)
-}
+
+
+suppress_results <- manual_k_suppress(data, quasi_identifiers, KANON_LEVEL)
+suppress_results$results
+suppress_results$suppressed_data
+suppressed_data <- suppress_results$suppressed_data
+suppressed_data[suppressed_data=="Suppressed"] <- NA
+summarize_suppression(suppressed_data,quasi_identifiers)
+
+
+
 
