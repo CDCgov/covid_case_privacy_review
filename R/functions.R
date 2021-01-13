@@ -55,14 +55,27 @@ summarize_violations <- function(data, sdc, k, qis){
   fk
 }
 
-#print out a little table that summarizes all the NAs and supressions
-summarize_suppression <- function(data, qis){
+#print out a little table that summarizes all the NAs and suppression
+summarize_suppression <- function(data, qis, print = TRUE){
   na_count <-sapply(data[qis], function(y) commas(sum(length(which(is.na(y))))))
   na_percent <-sapply(data[qis], function(y) percent(sum(length(which(is.na(y))))/length(y)))
   suppression_summary <- data.frame(na_count,na_percent)
-  print("Existing suppression summary:")
-  print(suppression_summary)
-  cat("\n\n")
+
+  df = data[qis]
+  num_complete_recs = nrow(df[complete.cases(df),])
+  num_total_recs = nrow(df)
+  num_records_with_suppression = num_total_recs - num_complete_recs
+  pct_records_with_suppression = percent(num_records_with_suppression/num_total_recs)
+  suppression_summary["records_with_any_field_suppressed",] = list("na_count"=commas(num_records_with_suppression),
+                                                                   "na_percent"=pct_records_with_suppression)
+
+  if (print){
+    print("Existing suppression summary:")
+    print(suppression_summary)
+    cat("\n\n")
+  }
+
+  suppression_summary
 }
 
 #print out info on any linked variable violations. Like if state is suppressed but county isn't. This should never happen, but want to check just in case.

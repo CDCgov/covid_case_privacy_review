@@ -47,126 +47,50 @@ qis_permulations = permutatotions(demo_quasi_identifiers, c("case_month", locati
 results = list()
 
 for (perm in qis_permulations){
-  result = manual_k_suppress(suppress_results$suppressed_data, perm, KANON_LEVEL)
-  results <- append(results, result)
+  cat("Calculating permutation for <",perm,">.\n")
+  perm_suppression_result = manual_k_suppress(suppress_results$suppressed_data, perm, KANON_LEVEL)
+  print(perm_suppression_result$results)
+  sd <- perm_suppression_result$suppressed_data
+  sd[sd=="Suppressed"] <- NA
+  summarize_suppression(sd,quasi_identifiers)
+  cat("Total number of suppressed fields:",sum(perm_suppression_result$results$violations),"\n")
+
+  cat("Total number of rows with at least one suppressed quasi-identifier:",nrow(sd[is.na(sd$case_month)
+                                                                                                 |is.na(sd$res_state)
+                                                                                                 |is.na(sd$res_county)
+                                                                                                 |is.na(sd$age_group)
+                                                                                                 |is.na(sd$sex)
+                                                                                                 |is.na(sd$race)
+                                                                                                 |is.na(sd$ethnicity),]))
+  results <- append(results, perm_suppression_result)
 }
 
-# below here is trash
+#turn all those results into a summary table
+summary = data.frame("permutation"=character(), "total_fields_suppressed"=integer(), "total_records_with_suppression"=integer(), stringsAsFactors=FALSE)
 
-perms_dupe = expand.grid(demo_quasi_identifiers,demo_quasi_identifiers,demo_quasi_identifiers,demo_quasi_identifiers)
-perms = eg[apply(eg, 1, anyDuplicated) == 0, ]
-my_list = list()
-my_list2 = list()
-for (row in 1:nrow(perms)){
-  ml = unlist(perms[row,],use.names=FALSE)
-  print(c("case_month", location_quasi_identifiers,ml))
+#I screwed up and added each result as two items, so want to evaluate in pairs with first being results and second being suppressed dataset results
+for (i in seq(1,47,2)){
+
+  permutation = toString(results[i]$results$field)
+  print(permutation)
+  total_fields_suppressed = sum(results[i]$results$violations)
+  sd = results[i+1]$suppressed_data
+  sd[sd=="Suppressed"] <- NA
+  summarize_suppression(sd,quasi_identifiers)
+  total_records_with_suppression = nrow(sd[is.na(sd$case_month)
+                                           |is.na(sd$res_state)
+                                           |is.na(sd$res_county)
+                                           |is.na(sd$age_group)
+                                           |is.na(sd$sex)
+                                           |is.na(sd$race)
+                                           |is.na(sd$ethnicity),])
+
+  summary[nrow(summary) + 1,] = list("permutation"= permutation,
+                                     "total_fields_suppressed"=total_fields_suppressed,
+                                     "total_records_with_suppression"=total_records_with_suppression)
 }
 
-for (row in 1:nrow(perms)){
-  ml = unlist(perms[row,],use.names=FALSE)
-  p = c("case_month", location_quasi_identifiers,ml)
-  print(p)
-  my_list <- append(my_list,list(p))
-}
-
-my_list[my_list=="1"] <- "age_group"
-
-for (i in my_list){
-  print(which(i=="1"))
-  item = replace(
-    replace(
-      replace(
-        replace(i,which(i=="1"),"age_group"),
-              which(i=="2"), "sex"),
-      which(i=="3","race"),
-      which(i=="4","ethnicity")))
-
-  print(replace(i,which(i=="1"),"age_group"))
-
-}
-
-for (i in my_list){
-  item = replace(i,which(i=="1"),"age_group")
-  item = replace(item,which(item=="2"),"sex")
-  item = replace(item,which(item=="3"),"race")
-  item = replace(item,which(item=="4"),"ethnicity")
-  my_list2 <- append(my_list2,list(item))
-  #print(item)
-}
-
-for (i in my_list){
-  item = replace(replace(replace(replace(i,which(i=="1"),"age_group"),which(i=="2"),"sex"),which(i=="3"),"race"),which(i=="4"),"ethnicity")
-  print(item[1])
-}
-which(my_list=="1")
-replace(my_list,c(1,2,3,4),c("age_group","sex","race","ethnicity"))
-as.character(perms[1,])
-demo_quasi_identifiers[1]
-
-my_list = list()
-my_list = list(c("age_group","sex","race","ethnicity"),c("age_group","sex","ethnicity","race"))
-length(append(my_list,"foo"))
-length(my_list)
-
-for (vec in my_list){
-  print(vec)
-}
-
-for (i in 1:4){
-  for (ii in 1:4){
-    for (iii in 1:4){
-      for (iiii in 1:4){
-        my_list <- append(my_list,c(demo_quasi_identifiers[i],demo_quasi_identifiers[ii],demo_quasi_identifiers[iii],demo_quasi_identifiers[iiii]))
-        print(c(demo_quasi_identifiers[i],demo_quasi_identifiers[ii],demo_quasi_identifiers[iii],demo_quasi_identifiers[iiii]))
-      }
-    }
-  }
-}
-
-transposed = t(perms)
-
-apply(transposed, 1, function(x) {
-  #manual_k_suppress(suppress_results$suppressed_data,c("case_month", location_quasi_identifiers,x),KANON_LEVEL)
-  print(c("case_month", location_quasi_identifiers,x))
-})
-
-for (row in transposed){
-  print(row)
-}
-
-apply(perms, 1, function(x) {print(unlist(x, use.names=FALSE))})
-apply(perms, 2, function(x) {print(x)})
-apply(perms, 2, function(x) {
-  for (i in x){
-    print(i)
-    }
-  print("|")
-  }
-  )
-
-apply(perms, 2, function(x) {
-  #manual_k_suppress(suppress_results$suppressed_data,c("case_month", location_quasi_identifiers,x),KANON_LEVEL)
-  print(c("case_month", location_quasi_identifiers,x))
-  })
-
-apply(perms,2)
-
-for (perm in perms){
-  cat("perm(",perm,")\n")
-}
-for (row in 1:nrow(perms)){
-  print(unlist(perms[row,],use.names=FALSE))
-  ml = unlist(perms[row,],use.names=FALSE)
-  print(length(ml))
-  print(typeof(ml))
-  for (item in ml){
-    print(item)
-  }
-}
-strsplit(perm[0]," ")
-for (item in perm[0]){
-  print(item)
-}
-length(perms[1,1])
+summary
+write.csv(summary,file=paste0(out_dir,"/summary_demographic_permutation.csv"))
 
 
