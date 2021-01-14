@@ -71,11 +71,45 @@ summarize_suppression <- function(data, qis, print = TRUE){
 
   if (print){
     print("Existing suppression summary:")
+    cat("Total records in dataset:",commas(num_total_recs),"\n")
     print(suppression_summary)
     cat("\n\n")
   }
 
   suppression_summary
+}
+
+#prints out a table that summarizes the missing and suppressed fields
+summmarize_utility <- function(data, qis, print = TRUE){
+  suppressed <-sapply(data[qis], function(y) commas(sum(length(which(is.na(y))))))
+  suppressed_percent <-sapply(data[qis], function(y) percent(sum(length(which(is.na(y))))/length(y)))
+  missing <-sapply(data[qis], function(y) commas(sum(length(which(y=="Missing")))))
+  missing_percent <-sapply(data[qis], function(y) percent(sum(length(which(y=="Missing")))/length(y)))
+
+  utility_summary <- data.frame(suppressed,suppressed_percent,missing,missing_percent)
+
+  df = data[qis]
+  num_complete_recs = nrow(df[complete.cases(df),])
+  num_total_recs = nrow(df)
+  num_records_with_suppression = num_total_recs - num_complete_recs
+  pct_records_with_suppression = percent(num_records_with_suppression/num_total_recs)
+
+  num_records_with_missing <- sum(apply(df,1, function(y) sum(which(any(y=="Missing")))))
+  pct_records_with_missing = percent(num_records_with_missing/num_total_recs)
+  utility_summary["records_with_any_field",] = list("suppressed"=commas(num_records_with_suppression),
+                                                    "suppressed_percent"=pct_records_with_suppression,
+                                                    "missing"=commas(num_records_with_missing),
+                                                    "missing_percent"=pct_records_with_missing)
+
+  if (print){
+    cat("Utility summary:\n")
+    cat("Total records in dataset:",commas(num_total_recs),"\n")
+    print(utility_summary)
+    cat("\n\n")
+  }
+
+  utility_summary
+
 }
 
 #print out info on any linked variable violations. Like if state is suppressed but county isn't. This should never happen, but want to check just in case.

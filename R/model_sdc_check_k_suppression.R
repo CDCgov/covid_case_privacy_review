@@ -64,14 +64,32 @@ suppress_results$results
 suppressed_data <- suppress_results$suppressed_data
 suppressed_data[suppressed_data=="Suppressed"] <- NA
 summarize_suppression(suppressed_data,quasi_identifiers)
-cat("Total number of suppressed fields:",sum(suppress_results$results$violations),"\n")
 
-cat("Total number of rows with at least one suppressed quasi-identifier:",nrow(suppressed_data[is.na(suppressed_data$case_month)
-                     |is.na(suppressed_data$res_state)
-                     |is.na(suppressed_data$res_county)
-                     |is.na(suppressed_data$age_group)
-                     |is.na(suppressed_data$sex)
-                     |is.na(suppressed_data$race)
-                     |is.na(suppressed_data$ethnicity),]))
+#let's get a summary of a dataset with: # values total (rowsxcolumns), values missing, values suppressed; just quasi-identifiers for now
+suppressed_data <- suppress_results$suppressed_data
+suppressed_data[suppressed_data=="Suppressed"] <- NA
+data_summary = summmarize_utility(suppressed_data, quasi_identifiers)
+data_summary
 
+#here's all the non-k-anon based suppressions
+
+#set state fips code to NA where the state is NA (#6)
+working_data[is.na(working_data$res_state),]$state_fips_code <- NA
+
+#set county to NA where state is NA (#7)
+working_data[is.na(working_data$res_state),]$res_county <- NA
+
+#set county fips code to NA where the county is NA (#8)
+working_data[is.na(working_data$res_county),]$county_fips_code <- NA
+
+#let's see what suppressing small population counties looks like (#3)
+population_suppression <- function(data, pop_level){
+  working_data <- data.frame(data)
+  cat("Suppressing small population counties with population less than (",pop_level,")\n")
+
+}
+
+# scratch
+
+working_data[is.na(working_data$county_population),]
 
