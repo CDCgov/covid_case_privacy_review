@@ -38,7 +38,7 @@ data$res_state[is.na(data$res_state)] <- "Missing"
 data$res_county[is.na(data$res_county)] <- "Missing"
 
 # This should be zero suppressed before I start
-summarize_suppression(data, quasi_identifiers)
+suppression_summary <- summarize_suppression(data, quasi_identifiers)
 
 #let's look at all and k=11
 cat("Let's look at all quasi-identifiers (", quasi_identifiers, ") at k=(",KANON_LEVEL,").\n")
@@ -46,7 +46,7 @@ suppress_results <- manual_k_suppress(data, quasi_identifiers, KANON_LEVEL)
 suppress_results$results
 suppressed_data <- suppress_results$suppressed_data
 suppressed_data[suppressed_data=="Suppressed"] <- NA
-summarize_suppression(suppressed_data,quasi_identifiers)
+suppression_summary = summarize_suppression(suppressed_data,quasi_identifiers)
 
 #let's look at location and k=1000
 cat("Let's look at location quasi-identifiers (", location_quasi_identifiers, ") at k=(",KANON_LEVEL_LOCATION,").\n")
@@ -54,7 +54,7 @@ suppress_results <- manual_k_suppress(data, location_quasi_identifiers, KANON_LE
 suppress_results$results
 suppressed_data <- suppress_results$suppressed_data
 suppressed_data[suppressed_data=="Suppressed"] <- NA
-summarize_suppression(suppressed_data,location_quasi_identifiers)
+suppression_summary = summarize_suppression(suppressed_data,location_quasi_identifiers)
 
 cat("Now let's look at them both chained, k=11 run ontop of data suppressed by location first.\n")
 suppress_results <- manual_k_suppress(data, location_quasi_identifiers, KANON_LEVEL_LOCATION)
@@ -63,13 +63,16 @@ suppress_results <- manual_k_suppress(suppress_results$suppressed_data, quasi_id
 suppress_results$results
 suppressed_data <- suppress_results$suppressed_data
 suppressed_data[suppressed_data=="Suppressed"] <- NA
-summarize_suppression(suppressed_data,quasi_identifiers)
+suppression_summary = summarize_suppression(suppressed_data,quasi_identifiers)
 
 #let's get a summary of a dataset with: # values total (rowsxcolumns), values missing, values suppressed; just quasi-identifiers for now
 suppressed_data <- suppress_results$suppressed_data
 suppressed_data[suppressed_data=="Suppressed"] <- NA
 data_summary = summmarize_utility(suppressed_data, quasi_identifiers)
 data_summary
+
+qs = quick_summary(suppressed_data, label="all_fields", qis=quasi_identifiers)
+t(qs)
 
 #here's all the non-k-anon based suppressions
 
@@ -89,7 +92,13 @@ population_suppression <- function(data, pop_level){
 
 }
 
+#let's see what suppressing demographics for small county subpopulations (#4)
+#TBD
+
+#let's see what suppressing demographics for high case counts among small county subpopulations (#5)
+#TBD
+
 # scratch
 
-working_data[is.na(working_data$county_population),]
+
 

@@ -112,6 +112,71 @@ summmarize_utility <- function(data, qis, print = TRUE){
 
 }
 
+#creates a line level quick summary of a dataset breaking out total records, total records, missing values, complete values, unknown values, suppressed values and available values.
+#if you pass in a list of quasi identifiers you'll get a second row for just quasis
+# returns a dataframe with 1 or two records
+quick_summary <-function(data, label="fields", qis=NULL, print=TRUE){
+
+  summary <- data.frame("total_records"=integer(),
+                        "total_columns"=integer(),
+                        "total_fields"= integer(),
+                        "missing_fields"=integer(),
+                        "missing_pct"=double(),
+                        "complete_fields"=integer(),
+                        "complete_pct"=double(),
+                        "unknown_fields"=integer(),
+                        "unknown_pct"=double(),
+                        "suppressed_fields"=integer(),
+                        "suppressed_pct"=double(),
+                        "available_fields"=integer(),
+                        "available_pct"=double(),
+                        stringsAsFactors=FALSE)
+
+  working_data <- data.frame(data)
+  tot_recs = nrow(working_data)
+  tot_cols = ncol(working_data)
+  tot_cells = tot_recs*tot_cols
+  missing_cells <-sum(sapply(working_data, function(y) sum(length(which(y=="Missing")))))
+  missing_percent = missing_cells/tot_cells
+  complete_cells = tot_cells - missing_cells
+  complete_percent = complete_cells/tot_cells
+  unknown_cells <-sum(sapply(working_data, function(y) sum(length(which(y=="Unknown")))))
+  unknown_percent = unknown_cells/tot_cells
+  suppressed_cells <-sum(sapply(working_data, function(y) sum(length(which(y=="Suppressed"|is.na(y))))))
+  suppressed_percent = suppressed_cells/tot_cells
+  available_cells = tot_cells - missing_cells - suppressed_cells - unknown_cells
+  available_percent = available_cells/tot_cells
+
+  summary[label,] <- c(commas(tot_recs),
+                       commas(tot_cells),
+                       commas(tot_cols),
+                       commas(missing_cells),
+                       percent(missing_percent),
+                       commas(complete_cells),
+                       percent(complete_percent),
+                       commas(unknown_cells),
+                       percent(unknown_percent),
+                       commas(suppressed_cells),
+                       percent(suppressed_percent),
+                       commas(available_cells),
+                       percent(available_percent)
+  )
+  if(!is.null(qis)){
+    quasi_summary = quick_summary(working_data[qis],"quasi_fields",print=FALSE)
+    summary <- rbind(summary,quasi_summary)
+  }
+
+  if (print){
+    print("Quick summary:")
+    #cat("Total records in dataset:",commas(num_total_recs),"\n")
+    print(summary)
+    cat("\n\n")
+  }
+
+  summary
+
+}
+
 #print out info on any linked variable violations. Like if state is suppressed but county isn't. This should never happen, but want to check just in case.
 summarize_linked_attribute_violations <- function(data, linked_attributes){
   cat('Processing checks for linked fields (',unlist(linked_attributes),')')
