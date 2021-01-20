@@ -81,12 +81,16 @@ summarize_suppression <- function(data, qis, print = TRUE){
 
 #prints out a table that summarizes the missing and suppressed fields
 summmarize_utility <- function(data, qis, print = TRUE){
-  suppressed <-sapply(data[qis], function(y) commas(sum(length(which(is.na(y))))))
-  suppressed_percent <-sapply(data[qis], function(y) percent(sum(length(which(is.na(y))))/length(y)))
-  missing <-sapply(data[qis], function(y) commas(sum(length(which(y=="Missing")))))
-  missing_percent <-sapply(data[qis], function(y) percent(sum(length(which(y=="Missing")))/length(y)))
+  record_count = nrow(data)
+  suppressed <-sapply(data[qis], function(y) sum(length(which(is.na(y)))))
+  suppressed_percent <- suppressed/record_count
+  missing <-sapply(data[qis], function(y) sum(length(which(y=="Missing"))))
+  missing_percent <- missing/record_count
 
-  utility_summary <- data.frame(suppressed,suppressed_percent,missing,missing_percent)
+  utility_summary <- data.frame("suppressed"=commas(suppressed),
+                                "suppressed_percent"=percent(suppressed_percent),
+                                "missing"=commas(missing),
+                                "missing_percent"=percent(missing_percent))
 
   df = data[qis]
   num_complete_recs = nrow(df[complete.cases(df),])
@@ -213,12 +217,14 @@ manual_k_suppress <- function(data,qis,k){
   working_data <- data.frame(data)
   cat("Suppressing at k-level(",k,") with quasi-identifiers(",qis,")\n")
 
+  #I want to pop off each quasi identifier after I run it, so use this tempory list that I mutate in the loop, sdc doesn't care about order of list
+  stack_qis = qis
   for (qi in rev(qis)){
     #qi = "ethnicity" #debug
     #qi = "race" #debug
     cat("Processing specific quasi-identifer(",qi,") start, before suppression.\n")
     sdcObj <- createSdcObj(dat=working_data,
-                           keyVars=qis,
+                           keyVars=stack_qis,
                            numVars=NULL,
                            weightVar=NULL,
                            hhId=NULL,
@@ -230,7 +236,7 @@ manual_k_suppress <- function(data,qis,k){
                            alpha=c(0),
                            ghostVars = NULL)
     sdc_print(sdcObj, k)
-    fk = summarize_violations(working_data, sdcObj, k, qis)
+    fk = summarize_violations(working_data, sdcObj, k, stack_qis)
     expected_reid_before=round(sdcObj@risk$global$risk_ER,2)
     expected_reid_pct_before=round(sdcObj@risk$global$risk_pct,2)
 
@@ -258,7 +264,7 @@ manual_k_suppress <- function(data,qis,k){
       working_data[[qi]][working_data$fk < k] <- "Suppressed" #sdcmicro is slow if we set this to NA, set to "Suppressed" for modeling purposes, actual suppression will set to NA/NULL
       cat("Processing specific quasi-identifer(",qi,") after suppression\n")
       sdcObj <- createSdcObj(dat=working_data,
-                             keyVars=qis,
+                             keyVars=stack_qis,
                              numVars=NULL,
                              weightVar=NULL,
                              hhId=NULL,
@@ -270,7 +276,7 @@ manual_k_suppress <- function(data,qis,k){
                              alpha=c(0),
                              ghostVars = NULL)
       sdc_print(sdcObj, k)
-      fk = summarize_violations(working_data, sdcObj, k, qis)
+      fk = summarize_violations(working_data, sdcObj, k, stack_qis)
       expected_reid_after=round(sdcObj@risk$global$risk_ER,2)
       expected_reid_pct_after=round(sdcObj@risk$global$risk_pct,2)
 
@@ -281,7 +287,9 @@ manual_k_suppress <- function(data,qis,k){
                                          "expected_reid_pct_before"=expected_reid_pct_before,
                                          "expected_reid_after"=expected_reid_after,
                                          "expected_reid_pct_after"=expected_reid_pct_after)
+      stack_qis = stack_qis[stack_qis != qi]
     }
+    #summmarize_utility(working_data, qis)
   }
 
 
@@ -312,4 +320,9 @@ permutatotions <- function(demo_qis,prefix_qis = NULL){
 
   cleaned_list
 
+}
+
+#reads all the files from the glob
+read_parquet_parts <- function(glob){
+  data.table::rbindlist(lapply(Sys.glob(glob), arrow::read_parquet))
 }
