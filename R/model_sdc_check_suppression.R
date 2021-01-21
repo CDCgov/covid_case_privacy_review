@@ -20,6 +20,7 @@ data_dir = "../data/raw"
 #if I use a CSV then there's logic to change down below
 file_name <- "public_county_raw_2020-01-16/*.parquet"
 #file_name <- "modeling_suppression_utility_countyjan_confB_2021-01-06.parquet"
+file_name <- "public_county_geography_debug_2020-01-20.parquet"
 full_file_name = paste(data_dir,"/",file_name,sep="")
 
 location_quasi_identifiers = c("res_state","res_county")

@@ -33,7 +33,7 @@ COUNTY_DEMO_POPULATION_LEVEL <- 20*KANON_LEVEL
 COUNTY_DEMO_POPULATION_LEVEL
 
 location_quasi_identifiers = c("res_state","res_county")
-quasi_identifiers = c(location_quasi_identifiers, "age_group","sex","race_combined","ethnicity", "cdc_report_month")
+quasi_identifiers = c("case_month", location_quasi_identifiers, "age_group","sex","race","ethnicity")
 confidential_attributes = c()
 #in some cases where attributes are related, we want to suppress the linked attribute whenever the source is suppressed. Using this format as that's what sdcmicro expects for ghostVars
 linked_attributes = list(
@@ -42,19 +42,21 @@ linked_attributes = list(
   )
 
 #if I use a CSV then there's logic to change down below
-file_name <- "modeling_suppression_utility_countyjan_confB_2021-01-06.parquet"
-#file_name <- "modeling_suppression_utility_countyjan_confB.csv"
+file_name <- "public_county_geography_2020-01-21.parquet"
 suppressed_file_name = paste(out_dir,"/",file_name,".suppressed.csv",sep="")
 detailed_file_name = paste(data_dir,"/",file_name,sep="")
 print(detailed_file_name)
 
 #data = read.csv(detailed_file_name, fileEncoding="UTF-8-BOM", na.strings=c('NA',''))
-df = read_parquet(full_file_name, as_data_frame = TRUE)
+df = read_parquet(detailed_file_name, as_data_frame = TRUE)
 #for some reason the dataframe from arrow makes sdc take forever and error, but if I make a new dataframe it works, todo figure it out
 data <- data.frame(df)
 
-#summarize existing suppressions
-summmarize_utility(data, quasi_identifiers)
+#summarize dataset
+qs = quick_summary(data, label="all_fields", qis=quasi_identifiers)
+
+#summarize existing utility
+summary = summmarize_utility(data, quasi_identifiers)
 
 #any linked variables not suppressed when they are supposed to be?
 summarize_linked_attribute_violations(data, linked_attributes)

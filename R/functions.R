@@ -57,8 +57,8 @@ summarize_violations <- function(data, sdc, k, qis){
 
 #print out a little table that summarizes all the NAs and suppression
 summarize_suppression <- function(data, qis, print = TRUE){
-  na_count <-sapply(data[qis], function(y) commas(sum(length(which(is.na(y))))))
-  na_percent <-sapply(data[qis], function(y) percent(sum(length(which(is.na(y))))/length(y)))
+  na_count <-sapply(data[qis], function(y) commas(sum(length(which(y=="NA")))))
+  na_percent <-sapply(data[qis], function(y) percent(sum(length(which(y=="NA")))/length(y)))
   suppression_summary <- data.frame(na_count,na_percent)
 
   df = data[qis]
@@ -82,7 +82,8 @@ summarize_suppression <- function(data, qis, print = TRUE){
 #prints out a table that summarizes the missing and suppressed fields
 summmarize_utility <- function(data, qis, print = TRUE){
   record_count = nrow(data)
-  suppressed <-sapply(data[qis], function(y) sum(length(which(is.na(y)))))
+
+  suppressed <-sapply(data[qis], function(y) sum(length(which(y=="Suppressed"|y=="NA"))))
   suppressed_percent <- suppressed/record_count
   missing <-sapply(data[qis], function(y) sum(length(which(y=="Missing"))))
   missing_percent <- missing/record_count
@@ -95,7 +96,7 @@ summmarize_utility <- function(data, qis, print = TRUE){
   df = data[qis]
   num_complete_recs = nrow(df[complete.cases(df),])
   num_total_recs = nrow(df)
-  num_records_with_suppression = num_total_recs - num_complete_recs
+  num_records_with_suppression <- sum(apply(df,1, function(y) sum(which(any(y=="NA")))))
   pct_records_with_suppression = percent(num_records_with_suppression/num_total_recs)
 
   num_records_with_missing <- sum(apply(df,1, function(y) sum(which(any(y=="Missing")))))
@@ -121,9 +122,9 @@ summmarize_utility <- function(data, qis, print = TRUE){
 # returns a dataframe with 1 or two records
 quick_summary <-function(data, label="fields", qis=NULL, print=TRUE){
 
-  summary <- data.frame("total_records"=integer(),
-                        "total_columns"=integer(),
-                        "total_fields"= integer(),
+  summary <- data.frame("total_fields"= integer(),
+                        "total_records"=integer(),
+                        "total_cells"=integer(),
                         "missing_fields"=integer(),
                         "missing_pct"=double(),
                         "complete_fields"=integer(),
@@ -146,14 +147,14 @@ quick_summary <-function(data, label="fields", qis=NULL, print=TRUE){
   complete_percent = complete_cells/tot_cells
   unknown_cells <-sum(sapply(working_data, function(y) sum(length(which(y=="Unknown")))))
   unknown_percent = unknown_cells/tot_cells
-  suppressed_cells <-sum(sapply(working_data, function(y) sum(length(which(y=="Suppressed"|is.na(y))))))
+  suppressed_cells <-sum(sapply(working_data, function(y) sum(length(which(y=="Suppressed"|y=="NA")))))
   suppressed_percent = suppressed_cells/tot_cells
   available_cells = tot_cells - missing_cells - suppressed_cells - unknown_cells
   available_percent = available_cells/tot_cells
 
-  summary[label,] <- c(commas(tot_recs),
+  summary[label,] <- c(commas(tot_cols),
+                       commas(tot_recs),
                        commas(tot_cells),
-                       commas(tot_cols),
                        commas(missing_cells),
                        percent(missing_percent),
                        commas(complete_cells),
@@ -165,10 +166,14 @@ quick_summary <-function(data, label="fields", qis=NULL, print=TRUE){
                        commas(available_cells),
                        percent(available_percent)
   )
+  summary <- t(summary)
+
   if(!is.null(qis)){
     quasi_summary = quick_summary(working_data[qis],"quasi_fields",print=FALSE)
-    summary <- rbind(summary,quasi_summary)
+    summary <- cbind(summary,quasi_summary)
   }
+
+  summary <- noquote(summary)
 
   if (print){
     print("Quick summary:")
