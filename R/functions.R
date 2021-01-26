@@ -39,7 +39,7 @@ sdc_print <- function(sdc,k){
 }
 
 #print out the number of violations and a sample
-#in: data, sdc object already computed on data for k, k level, quasi identifiers just used for printing exceptions
+#in: data, sdc object already computed on data for k, k level, quasi-identifiers just used for printing exceptions
 summarize_violations <- function(data, sdc, k, qis){
   #kAnon_violations(sdc, weighted=FALSE, k=k)[1]
 
@@ -47,7 +47,7 @@ summarize_violations <- function(data, sdc, k, qis){
   fk <- sdc@risk$individual[,2]
   violations <- cbind(data, fk)[sdc@risk$individual[,2] < k,c(qis,"fk")]
   num_v = nrow(violations)
-  cat("k-anon violations (",num_v,") for k=(",k,") and quasi identifiers(",qis,"). If greater than zero violations then here's 5 violations.\n")
+  cat("k-anon violations (",num_v,") for k=(",k,") and quasi-identifiers (",qis,"). If greater than zero violations, then here's 5 violations.\n")
   if (num_v > 0){
     print(violations[sample(nrow(violations),5),])
   }
@@ -64,7 +64,7 @@ summarize_suppression <- function(data, qis, print = TRUE){
   df = data[qis]
   num_complete_recs = nrow(df[complete.cases(df),])
   num_total_recs = nrow(df)
-  num_records_with_suppression = num_total_recs - num_complete_recs
+  num_records_with_suppression <- sum(apply(df,1, function(y) sum(which(any(y=="NA")))))
   pct_records_with_suppression = percent(num_records_with_suppression/num_total_recs)
   suppression_summary["records_with_any_field_suppressed",] = list("na_count"=commas(num_records_with_suppression),
                                                                    "na_percent"=pct_records_with_suppression)
@@ -118,7 +118,7 @@ summmarize_utility <- function(data, qis, print = TRUE){
 }
 
 #creates a line level quick summary of a dataset breaking out total records, total records, missing values, complete values, unknown values, suppressed values and available values.
-#if you pass in a list of quasi identifiers you'll get a second row for just quasis
+#if you pass in a list of quasi-identifiers you'll get a second row for just quasis
 # returns a dataframe with 1 or two records
 quick_summary <-function(data, label="fields", qis=NULL, print=TRUE){
 
@@ -195,7 +195,7 @@ summarize_linked_attribute_violations <- function(data, linked_attributes){
     for (linked_field in linked_fields){
       link_violations = subset(data, is.na(data[[source_field]]) & !is.na(data[[linked_field]]))
       num_v = nrow(link_violations)
-      cat("linked variable violations (",num_v,") for source_field=(",source_field,") and linked_field=(",linked_field,"). If greater than zero violations then here's 5 violations.\n")
+      cat("linked variable violations (",num_v,") for source_field=(",source_field,") and linked_field=(",linked_field,"). If greater than zero violations, then here's 5 violations.\n")
       if (num_v > 0){
         print(link_violations[,c(source_field,linked_field)][sample(nrow(link_violations),5),])
       }
@@ -220,9 +220,9 @@ manual_k_suppress <- function(data,qis,k){
                         stringsAsFactors=FALSE)
 
   working_data <- data.frame(data)
-  cat("Suppressing at k-level(",k,") with quasi-identifiers(",qis,")\n")
+  cat("Suppressing at k-level(",k,") with quasi-identifiers (",qis,")\n")
 
-  #I want to pop off each quasi identifier after I run it, so use this tempory list that I mutate in the loop, sdc doesn't care about order of list
+  #I want to pop off each quasi-identifier after I run it, so use this tempory list that I mutate in the loop, sdc doesn't care about order of list
   stack_qis = qis
   for (qi in rev(qis)){
     #qi = "ethnicity" #debug
@@ -261,12 +261,10 @@ manual_k_suppress <- function(data,qis,k){
                                          "expected_reid_after"=-1,
                                          "expected_reid_pct_after"=-1)
 
-      #working_data[working_data=="Suppressed"] <- NA
-      #summarize_suppression(working_data, qis)
       return(list("results"=results,"suppressed_data"=working_data))
     }else{
       cat(violations,"detected so continuing to process quasi(",qi,")\n")
-      working_data[[qi]][working_data$fk < k] <- "Suppressed" #sdcmicro is slow if we set this to NA, set to "Suppressed" for modeling purposes, actual suppression will set to NA/NULL
+      working_data[[qi]][working_data$fk < k] <- "NA" #sdcmicro is slow if we set this to NA, set to "NA" string to match what comes out of Palantir pipeline
       cat("Processing specific quasi-identifer(",qi,") after suppression\n")
       sdcObj <- createSdcObj(dat=working_data,
                              keyVars=stack_qis,
@@ -302,10 +300,10 @@ manual_k_suppress <- function(data,qis,k){
 
 }
 
-# given a list of quasi identifiers, returns a list of vectors for all unique permutations of the quasi identifiers, prefixed with another list
+# given a list of quasi-identifiers, returns a list of vectors for all unique permutations of the quasi-identifiers, prefixed with another list
 permutatotions <- function(demo_qis,prefix_qis = NULL){
   perms_dupe = expand.grid(demo_qis,demo_qis,demo_qis,demo_qis)
-  perms = eg[apply(eg, 1, anyDuplicated) == 0, ]
+  perms = perms_dupe[apply(perms_dupe, 1, anyDuplicated) == 0, ]
   ugly_list = list()
   cleaned_list = list()
 
@@ -327,7 +325,7 @@ permutatotions <- function(demo_qis,prefix_qis = NULL){
 
 }
 
-#reads all the files from the glob
+#reads all the parquet files from the glob
 read_parquet_parts <- function(glob){
   data.table::rbindlist(lapply(Sys.glob(glob), arrow::read_parquet))
 }

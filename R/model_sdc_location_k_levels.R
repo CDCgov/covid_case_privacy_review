@@ -118,7 +118,7 @@ for (i in kanon_test_levels){
   smallest_county_after = min(table(sdcObj@manipKeyVars$res_county))
 
   #check violations after, it should be zero
-  cat("Checking violations after suppression, should be zero..\n")
+  cat("Checking violations after suppression, should be zero.\n")
   fk = summarize_violations(working_data, sdcObj, i, location_quasi_identifiers)
 
   results[nrow(results) + 1,] = list("k"= i,

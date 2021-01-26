@@ -43,7 +43,7 @@ linked_attributes = list(
   )
 
 #if I use a CSV then there's logic to change down below
-file_name <- "public_county_geography_2020-01-22.parquet"
+file_name <- "public_county_geography_2020-01-22b.parquet"
 suppressed_file_name = paste(out_dir,"/",file_name,".suppressed.csv",sep="")
 detailed_file_name = paste(data_dir,"/",file_name,sep="")
 print(detailed_file_name)
@@ -113,10 +113,8 @@ cat("Writing out a privacy eval report to:", paste(report_dir,"/",file_name,".ht
 report(sdcObj, outdir = report_dir, filename = file_name,
        title = "SRRG Privacy Evaluation Report for Case Surveillance Public Data Set with Geography", internal = TRUE, verbose = FALSE)
 
-#TODO check for small states
-
-#TODO check for small counties
+#TODO check for small county populations
 
 #TODO check for small subpopulations
 
-#TODO check for cases higher than population
+#TODO check for cases higher than subpopulation
