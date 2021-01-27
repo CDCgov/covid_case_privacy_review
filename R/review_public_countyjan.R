@@ -43,7 +43,7 @@ linked_attributes = list(
   )
 
 #if I use a CSV then there's logic to change down below
-file_name <- "public_county_geography_2020-01-22b.parquet"
+file_name <- "public_county_geography_2020-01-26.parquet"
 suppressed_file_name = paste(out_dir,"/",file_name,".suppressed.csv",sep="")
 detailed_file_name = paste(data_dir,"/",file_name,sep="")
 print(detailed_file_name)
@@ -54,7 +54,7 @@ df = read_parquet(detailed_file_name, as_data_frame = TRUE)
 data <- data.frame(df)
 
 #summarize dataset
-qs = quick_summary(data, label="all_fields", qis=quasi_identifiers)
+result <- quick_summary(data, label="all_fields", qis=quasi_identifiers)
 
 #summarize existing utility
 summary = summmarize_utility(data, quasi_identifiers)

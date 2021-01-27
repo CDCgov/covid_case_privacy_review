@@ -65,7 +65,7 @@ summarize_suppression <- function(data, qis, print = TRUE){
   num_complete_recs = nrow(df[complete.cases(df),])
   num_total_recs = nrow(df)
   num_records_with_suppression <- sum(apply(df,1, function(y) sum(which(any(y=="NA")))))
-  pct_records_with_suppression = percent(num_records_with_suppression/num_total_recs)
+  pct_records_with_suppression = percent(num_records_with_suppression/num_total_recs,1)
   suppression_summary["records_with_any_field_suppressed",] = list("na_count"=commas(num_records_with_suppression),
                                                                    "na_percent"=pct_records_with_suppression)
 
@@ -89,9 +89,9 @@ summmarize_utility <- function(data, qis, print = TRUE){
   missing_percent <- missing/record_count
 
   utility_summary <- data.frame("suppressed"=commas(suppressed),
-                                "suppressed_percent"=percent(suppressed_percent),
+                                "suppressed_percent"=percent(suppressed_percent,1),
                                 "missing"=commas(missing),
-                                "missing_percent"=percent(missing_percent))
+                                "missing_percent"=percent(missing_percent,1))
 
   df = data[qis]
   num_complete_recs = nrow(df[complete.cases(df),])
@@ -156,15 +156,15 @@ quick_summary <-function(data, label="fields", qis=NULL, print=TRUE){
                        commas(tot_recs),
                        commas(tot_cells),
                        commas(missing_cells),
-                       percent(missing_percent),
+                       percent(missing_percent,0),
                        commas(complete_cells),
-                       percent(complete_percent),
+                       percent(complete_percent,0),
                        commas(unknown_cells),
-                       percent(unknown_percent),
+                       percent(unknown_percent,0),
                        commas(suppressed_cells),
-                       percent(suppressed_percent),
+                       percent(suppressed_percent,0),
                        commas(available_cells),
-                       percent(available_percent)
+                       percent(available_percent,0)
   )
   summary <- t(summary)
 
