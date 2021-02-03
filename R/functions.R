@@ -64,7 +64,8 @@ summarize_suppression <- function(data, qis, print = TRUE){
   na_percent <-na_count/num_total_recs
   suppression_summary <- data.frame("na_count"=commas(na_count),"na_percent"=percent(na_percent,1))
 
-  num_records_with_suppression <- sum(apply(df,1, function(y) sum(which(any(y=="NA")))))
+  #num_records_with_suppression <- sum(apply(df,1, function(y) sum(which(any(y=="NA")))))
+  num_records_with_suppression = sum(rowSums(sapply(data[quasi_identifiers], function(y) y=="NA")) > 0)
   pct_records_with_suppression = num_records_with_suppression/num_total_recs
   suppression_summary["records_with_any_field_suppressed",] = list("na_count"=commas(num_records_with_suppression),
                                                                    "na_percent"=percent(pct_records_with_suppression,1))
@@ -80,7 +81,7 @@ summarize_suppression <- function(data, qis, print = TRUE){
 }
 
 #prints out a table that summarizes the missing and suppressed fields
-summmarize_utility <- function(data, qis, print = TRUE){
+summarize_utility <- function(data, qis, print = TRUE){
   df = data[qis]
   num_total_recs = nrow(df)
 
@@ -94,10 +95,12 @@ summmarize_utility <- function(data, qis, print = TRUE){
                                 "missing"=commas(missing),
                                 "missing_percent"=percent(missing_percent,1))
 
-  num_records_with_suppression <- sum(apply(df,1, function(y) sum(which(any(y=="NA")))))
+  #num_records_with_suppression <- sum(apply(df,1, function(y) sum(which(any(y=="NA")))))
+  num_records_with_suppression = sum(rowSums(sapply(data[quasi_identifiers], function(y) y=="NA")) > 0)
   pct_records_with_suppression = num_records_with_suppression/num_total_recs
 
-  num_records_with_missing <- sum(apply(df,1, function(y) sum(which(any(y=="Missing")))))
+  #num_records_with_missing <- sum(apply(df,1, function(y) sum(which(any(y=="Missing")))))
+  num_records_with_missing = sum(rowSums(sapply(data[quasi_identifiers], function(y) y=="Missing")) > 0)
   pct_records_with_missing = num_records_with_missing/num_total_recs
 
   utility_summary["records_with_any_field",] = list("suppressed"=commas(num_records_with_suppression),
@@ -141,13 +144,15 @@ quick_summary <-function(data, label="fields", qis=NULL, print=TRUE){
   tot_cols = ncol(working_data)
   tot_cells = tot_recs*tot_cols
 
-  missing_cells <-sum(working_data=="Missing", na.rm=TRUE)
+  #casting non-char cells to char to check for "Missing" takes a long time, and since only char fields get coded to Missing, it's safe to drop all the non-char columns, still want to use total cells for percent calcs of the overall dataet
+  char_wd = working_data[, sapply(working_data, class) == 'character']
+  missing_cells <-sum(sapply(char_wd, function(y) sum(length(which(y=="Missing")))))
   missing_percent = missing_cells/tot_cells
   complete_cells = tot_cells - missing_cells
   complete_percent = complete_cells/tot_cells
-  unknown_cells <-sum(working_data=="Unknown", na.rm=TRUE)
+  unknown_cells <-sum(sapply(char_wd, function(y) sum(length(which(y=="Unknown")))))
   unknown_percent = unknown_cells/tot_cells
-  suppressed_cells <-sum(working_data=="NA", na.rm=TRUE)
+  suppressed_cells <-sum(sapply(char_wd, function(y) sum(length(which(y=="NA")))))
   suppressed_percent = suppressed_cells/tot_cells
 
   available_cells = tot_cells - missing_cells - suppressed_cells - unknown_cells

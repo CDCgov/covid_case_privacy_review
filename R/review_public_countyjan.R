@@ -43,7 +43,7 @@ linked_attributes = list(
   )
 
 #if I use a CSV then there's logic to change down below
-file_name <- "public_county_geography_2020-01-28.parquet"
+file_name <- "public_county_geography_2020-02-02.parquet"
 suppressed_file_name = paste(out_dir,"/",file_name,".suppressed.csv",sep="")
 detailed_file_name = paste(data_dir,"/",file_name,sep="")
 print(detailed_file_name)
@@ -57,15 +57,18 @@ data <- data.frame(df)
 result <- quick_summary(data, label="all_fields", qis=quasi_identifiers)
 
 #summarize existing utility
-summary <- summmarize_utility(data, quasi_identifiers)
+summary <- summarize_utility(data, quasi_identifiers)
 
 #any linked variables not suppressed when they are supposed to be?
 summarize_linked_attribute_violations(data, linked_attributes)
 
 # review for locations first
 
+#NA as a category value identified states with <1000 NA and we don't care about that
+data2 = data.frame(data)
+data2[data2=="NA"] <- NA
 ## Set up sdcMicro object
-sdcObj <- createSdcObj(dat=data,
+sdcObj <- createSdcObj(dat=data2,
                        keyVars=location_quasi_identifiers,
                        numVars=NULL,
                        weightVar=NULL,
@@ -82,7 +85,7 @@ sdcObj <- createSdcObj(dat=data,
 sdc_print(sdcObj, KANON_LEVEL_LOCATION)
 
 #should be zero
-fk = summarize_violations(data, sdcObj, KANON_LEVEL_LOCATION, location_quasi_identifiers)
+fk = summarize_violations(data2, sdcObj, KANON_LEVEL_LOCATION, location_quasi_identifiers)
 
 #now lets check for k-anonymity using full quasi-identifier set
 
@@ -103,7 +106,7 @@ sdcObj <- createSdcObj(dat=data,
 sdc_print(sdcObj, KANON_LEVEL)
 
 #this should be zero
-fk <- summarize_violations(data, sdcObj, KANON_LEVEL, quasi_identifiers)
+fk <- summarize_violations(data2, sdcObj, KANON_LEVEL, quasi_identifiers)
 
 # not actually performing suppression, but if needed to help debug uncomment below to generate an sdcmicro suppressed file
 #sdcObj <- kAnon(sdcObj, importance=c(1,1,1,1,1,1,2), combs=NULL, k=c(KANON_LEVEL))

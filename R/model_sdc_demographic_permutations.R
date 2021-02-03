@@ -19,7 +19,7 @@ out_dir = "../output"
 data_dir = "../data/raw"
 
 #if I use a CSV then there's logic to change down below
-file_name <- "public_county_geography_raw_2020-01-22b.parquet"
+file_name <- "public_county_geography_raw_2020-01-31.parquet"
 full_file_name = paste(data_dir,"/",file_name,sep="")
 
 location_quasi_identifiers = c("res_state","res_county")
@@ -36,7 +36,7 @@ data <- data.frame(df)
 
 # This should be zero suppressed before I start
 qs = quick_summary(data, label="all_fields", qis=quasi_identifiers)
-summary = summmarize_utility(data, quasi_identifiers)
+summary = summarize_utility(data, quasi_identifiers)
 
 #suppress_results <- manual_k_suppress(data, location_quasi_identifiers, KANON_LEVEL_LOCATION)
 #suppressed_data <- suppress_results$suppressed_data
@@ -53,10 +53,10 @@ for (perm in qis_permutations){
   print(perm_suppression_result$results)
   sd <- perm_suppression_result$suppressed_data
   sd[sd=="Suppressed"] <- "NA"
-  summarize_suppression(sd,quasi_identifiers)
-  cat("Total number of suppressed fields:",sum(perm_suppression_result$results$violations),"\n")
+  #summarize_suppression(sd,quasi_identifiers)
+  #cat("Total number of suppressed fields:",sum(perm_suppression_result$results$violations),"\n")
 
-  cat("Total number of rows with at least one suppressed quasi-identifier:",sum(apply(sd[quasi_identifiers],1, function(y) sum(which(any(y=="NA"))))))
+  #cat("Total number of rows with at least one suppressed quasi-identifier:",sum(apply(sd[quasi_identifiers],1, function(y) sum(which(any(y=="NA"))))))
 
   results <- append(results, perm_suppression_result)
 }
@@ -64,35 +64,46 @@ for (perm in qis_permutations){
 #turn all those results into a summary table
 summary = data.frame("permutation"=character(), "total_fields_suppressed"=integer(), "total_records_with_suppression"=integer(), stringsAsFactors=FALSE)
 
+results_file<-file(paste0(out_dir,"/permutation_details.txt"))
+sink(results_file, append=TRUE)
+
 #I screwed up and added each result as two items, so want to evaluate in pairs with first being results and second being suppressed dataset results
 for (i in seq(1,47,2)){
 
   permutation = toString(results[i]$results$field)
   print(permutation)
-  total_fields_suppressed = sum(results[i]$results$violations)
   sd = results[i+1]$suppressed_data
   sd[sd=="Suppressed"] <- "NA"
-  summarize_suppression(sd,quasi_identifiers)
+  summarize_utility(sd,quasi_identifiers)
+  total_fields_suppressed = sum(results[i]$results$violations)
   total_records_with_suppression <- sum(apply(sd[quasi_identifiers],1, function(y) sum(which(any(y=="NA")))))
 
   summary[nrow(summary) + 1,] = list("permutation"= permutation,
                                      "total_fields_suppressed"=total_fields_suppressed,
                                      "total_records_with_suppression"=total_records_with_suppression)
 }
+sink()
+close(results_file)
 
 summary
 write.csv(summary,file=paste0(out_dir,"/summary_demographic_permutation.csv"))
 
 # scratch
+
+
 #permutation with the fewest fields suppressed
 results[7]$results$field
 results[8]$suppressed_data[results[8]$suppressed_data=="Suppressed"] <- "NA"
 summary = summarize_suppression(results[8]$suppressed_data,quasi_identifiers)
+utility_summary = summarize_utility(results[8]$suppressed_data,quasi_identifiers)
+qs = quick_summary(results[8]$suppressed_data, label="all_fields", qis=quasi_identifiers)
+nrow(results[8]$suppressed_data[results[8]$suppressed_data$age_group=="Missing",])
 
 #permutation with age_group highest priority with the fewest fields suppressed
 results[35]$results$field
 results[36]$suppressed_data[results[36]$suppressed_data=="Suppressed"] <- "NA"
 summary = summarize_suppression(results[36]$suppressed_data,quasi_identifiers)
+nrow(results[36]$suppressed_data[results[36]$suppressed_data$age_group=="Missing",])
 
 #current permutation used
 results[47]$results$field
