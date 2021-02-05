@@ -9,6 +9,7 @@ If you have any of the above, please [submit an issue on github](https://github.
 ## Requires
 
 * [sdcMicro](https://cran.r-project.org/web/packages/sdcMicro/index.html) version >= 5.5.1
+* [arrow](https://cran.r-project.org/web/packages/arrow/index.html) version >= 2.0.0
 * R version >= 4.0.3 (although I suspect, but have not tested >=3.5)
 * optional for profiling
   * [DataExplorer](https://cran.r-project.org/web/packages/DataExplorer/index.html) >=0.8.2
@@ -32,9 +33,11 @@ These thresholds are applied to the quasi-identifiers and confidential variables
 
 We are working to improve these privacy procedures over time and welcome feedback and improvements submitted to this project as issues or pull requests.
 
-## Data file characteristics - Public11
+## Data file characteristics - Public12
 
-### Quasi-identifiers (11)
+The public use data file for "COVID-19 Case Surveillance Public Use Data" checks its 12 variables for...
+
+### Quasi-identifiers (3)
 
 Checked for k=5
 
@@ -42,19 +45,19 @@ Checked for k=5
 * sex 
 * race_ethnicity_combined 
 
-### Confidential attributes
+### Confidential attributes (1)
 
 * pos_spec_dt
 
 ## Data file charateristics - CountyJan
 
-The public use data file checks its xx variables for...
+The public use data file for "COVID-19 Case Surveillance Public Use Data with Geography" checks its 19 variables for...
 
 ### Population level
 
 Checking county population and res_county should never be populated if the county population (by fips code) is under 20k.
 
-### Quasi-identifiers (11)
+### Quasi-identifiers (7)
 
 Checked for k=1000
 
@@ -63,21 +66,24 @@ Checked for k=1000
 
 Checked for k=11
 
+* case_month
 * res_state – State of Residence
 * res_county – County of Residence
 * age_group 
 * sex 
 * race_combined
 * ethnicity
-* cdc_report_week (will be replaced by cdc_earliest_week) 
 
 ### Confidential attributes
 
-Don't think there are any confidential attributes in this data file.
+No confidential attributes are in this dataset.
 
 ## Run procedures
 
 To run these scripts, copy in or symlik a data file to the `data/raw` folder, update the script with the name of the data file, run from the `R` folder of this project. This script will generate output to the console and create a privacy report in the `reports` folder.
+
+* [R/review_public.R](R/review_public.R) - to review the public12 file
+* [R/review_public_countyjan.R](R/review_public_countyjan.R) - to review the public19 file
 
 ## Interpreting output
 
@@ -94,6 +100,7 @@ This project also includes a script called `profile_data.R` that uses the [DataE
 These scripts were developed and tested in R version 4.0.2 using the following packages and versions:
 
 * sdcMicro 5.5.1
+* arrow 2.0.0
 * DataExplorer 0.8.1 (optional for profiling)
 * Hmisc 4.4-0 (optional for profiling)
 * inspectdf 0.0.8 (optional for profiling)
@@ -104,17 +111,17 @@ These scripts were developed and tested in R version 4.0.2 using the following p
 These folders are meant to help organize and make it easier for others to understand and contribute.
 
 ```sh
-├── R                   <- R scripts
-│   ├── review_public.R <- main script to review data file
-│   ├── functions.R     <- functions that are reused in other scripts
-│   └── profile_data.R  <- creates a data profile report for exploratory data analysis
-├── data                <- data files used by project
-│   └── raw             <- raw files, original, immutable data dump
-├── docs                <- documentation and references (codebooks, etc)
-├── output              <- output files
-├── readme.md           <- Description of project, instructions for how to run
-└── reports             <- Generated reports and visualizations
-    └── log.md          <- logged results from scanned files
+├── R                             <- R scripts
+│   ├── review_public.R           <- script to review public12 data file
+│   ├── review_public_countyjan.R <- script to review public19 data file
+│   ├── functions.R               <- functions that are reused in other scripts
+│   └── profile_data.R            <- creates a data profile report for exploratory data analysis
+├── data                          <- data files used by project
+│   └── raw                       <- raw files, original, immutable data dump
+├── output                        <- output files
+├── readme.md                     <- Description of project, instructions for how to run
+└── reports                       <- Generated reports and visualizations
+    └── log.md                    <- logged results from reviewed files
 ```
 
 ## References
