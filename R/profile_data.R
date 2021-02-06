@@ -5,7 +5,7 @@ source("functions.R")
 # DataExplorer is not available in CRAN, need to download from github
 #library(devtools)
 #install_github("boxuancui/DataExplorer")
-
+library(rmarkdown)
 library(DataExplorer)
 library(Hmisc)
 library(inspectdf)
@@ -15,10 +15,10 @@ report_dir = "../reports"
 data_dir = "../data/raw"
 
 # change these depending on the current data set...
-report_file_name <- "COVID_Cases_Public_Limited_12312020_profile.html"
-report_title <- "COVID-19 Case Surveillance Public Use Data Profile (2020-12-31 version)"
+report_file_name <- "COVID_Cases_Public_Limited_01312021_profile.html"
+report_title <- "COVID-19 Case Surveillance Public Use Data Profile (2021-01-31▼ version)"
 
-file_name <- "COVID_Cases_Public_Limited_12312020.csv"
+file_name <- "COVID_Cases_Public_Limited_01312021.csv"
 detailed_file_name <- paste(data_dir,"/",file_name,sep="")
 
 cat("Processing file:", detailed_file_name,"\n\n")
@@ -44,7 +44,7 @@ DataExplorer::create_report(data,
                             report_title = report_title,
                             output_file = report_file_name,
                             output_dir = report_dir,
-                            config = configure_report(plot_bar_args=list(maxcat=100)))
+                            config = configure_report(plot_bar_args=list(maxcat=2000)))
 
 #describe(data)
 
