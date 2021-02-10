@@ -6,9 +6,12 @@
 #   confirming suppression for low population counties
 #   confirming suppression for low population demographics within counties
 #   confirming suppression for demographics where case count too high in county
+#   confirming suppression where only one county in a state is suppressed
 
-# actual supression logic is in DCIPHER contour workflow, this script confirms that files are meeting privacy rules to reduce risk of reidentification
+# actual supression logic is in HHSProtect code repository, this script confirms that files are meeting privacy rules to reduce risk of reidentification
 # note that this assumes that missing values aren't factored in for k-anon, to make them count as wildcards, adjust the alpha parameter to what percent you want them to count as wildcards
+
+# census file is processed in Protect based on https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html using the 2018 estimates for consistency with other parts of the response, version stored in repo is the summed and formatted version to make life easier. If we start using year other than 2018, then regenerate and update in repo.
 
 #sdcApp(maxRequestSize = 2000)
 #View(data)
@@ -33,12 +36,14 @@ COUNTY_POPULATION_LEVEL
 COUNTY_DEMO_POPULATION_LEVEL <- 20*KANON_LEVEL
 COUNTY_DEMO_POPULATION_LEVEL
 
+COUNTY_POP_FILE_NAME = paste0(data_dir,"/county_pop_demo_for_verify.csv")
+
 location_quasi_identifiers = c("res_state","res_county")
 quasi_identifiers = c("case_month", location_quasi_identifiers, "age_group","sex","race","ethnicity")
 confidential_attributes = c()
 #in some cases where attributes are related, we want to suppress the linked attribute whenever the source is suppressed. Using this format as that's what sdcmicro expects for ghostVars
 linked_attributes = list(
-  list("res_state",c("county_fips_code","state_fips_code")),
+  list("res_state",c("county_fips_code","state_fips_code", "res_county")),
   list("res_county",c("county_fips_code"))
   )
 
@@ -59,15 +64,14 @@ result <- quick_summary(data, label="all_fields", qis=quasi_identifiers)
 #summarize existing utility
 summary <- summarize_utility(data, quasi_identifiers)
 
-#any linked variables not suppressed when they are supposed to be?
+#any linked variables not suppressed when they are supposed to be? (rules #7,8,9)
 summarize_linked_attribute_violations(data, linked_attributes)
 
-# review for locations first
+# review for locations first (rules #1,2)
 
 #NA as a category value identified states with <1000 NA and we don't care about that
 data2 = data.frame(data)
 data2[data2=="NA"] <- NA
-## Set up sdcMicro object
 sdcObj <- createSdcObj(dat=data2,
                        keyVars=location_quasi_identifiers,
                        numVars=NULL,
@@ -79,7 +83,7 @@ sdcObj <- createSdcObj(dat=data2,
                        seed=0,
                        randomizeRecords=FALSE,
                        alpha=c(0),
-                       ghostVars = linked_attributes)
+                       ghostVars = NULL)
 
 # print to confirm observations, num variables, quasis, quasi describes, and risk info
 sdc_print(sdcObj, KANON_LEVEL_LOCATION)
@@ -87,8 +91,7 @@ sdc_print(sdcObj, KANON_LEVEL_LOCATION)
 #should be zero
 fk = summarize_violations(data2, sdcObj, KANON_LEVEL_LOCATION, location_quasi_identifiers)
 
-#now lets check for k-anonymity using full quasi-identifier set
-
+#now lets check for k-anonymity using full quasi-identifier set (rule #6)
 sdcObj <- createSdcObj(dat=data,
                        keyVars=quasi_identifiers,
                        numVars=NULL,
@@ -100,7 +103,7 @@ sdcObj <- createSdcObj(dat=data,
                        seed=0,
                        randomizeRecords=FALSE,
                        alpha=c(0),
-                       ghostVars = linked_attributes)
+                       ghostVars = NULL)
 
 # print to confirm observations, num variales, quasis, quasi describes, and risk info
 sdc_print(sdcObj, KANON_LEVEL)
@@ -116,8 +119,12 @@ cat("Writing out a privacy eval report to:", paste(report_dir,"/",file_name,".ht
 report(sdcObj, outdir = report_dir, filename = file_name,
        title = "SRRG Privacy Evaluation Report for Case Surveillance Public Data Set with Geography", internal = TRUE, verbose = FALSE)
 
-#TODO check for small county populations
+#TODO check for small county populations (rule #3)
 
-#TODO check for small subpopulations
+county_data = read.csv(COUNTY_POP_FILE_NAME, fileEncoding="UTF-8-BOM", na.strings=c('NA',''))
 
-#TODO check for cases higher than subpopulation
+#TODO check for small subpopulations (rule #4)
+
+#TODO check for cases higher than subpopulation (rule #5)
+
+#TODO check for county/state complementary (rule #10)

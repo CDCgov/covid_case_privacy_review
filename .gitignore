@@ -49,3 +49,6 @@ safety-db
 # OS specific files
 .DS_Store
 Thumbs.db
+
+#I normally don't want data files, but this one I specifically want to distribute because it's appropriate for distribution
+!data/raw/county_pop_demo_for_verify.csv
