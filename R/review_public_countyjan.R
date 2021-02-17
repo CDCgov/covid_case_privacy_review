@@ -1,12 +1,12 @@
-# perform a privacy impact review on the covid case surveillance public data file with geography
-#   manual suppression for all counties with population < 20,000
-#   k-anonymity 11 for all quasi-identifiers
+# perform a privacy impact review on the covid case surveillance public data file with geography, checking the 10 suppression rules
+#   k-anonymity 1000 for state/county (#1,#2)
+#   confirming suppression for low population counties (#3)
+#   confirming suppression for low population demographics within counties (#4)
+#   confirming suppression for demographics where case count too high in county (#5)
+#   k-anonymity 11 for all quasi-identifiers (#6)
+#   confirming suppression of linked variables (#7,8,9)
+#   confirming suppression where only one county in a state is suppressed (#10)
 #   if we had confidential variables we would check for l-diversity
-#   confirming suppression of linked variables
-#   confirming suppression for low population counties
-#   confirming suppression for low population demographics within counties
-#   confirming suppression for demographics where case count too high in county
-#   confirming suppression where only one county in a state is suppressed
 
 # actual supression logic is in HHSProtect code repository, this script confirms that files are meeting privacy rules to reduce risk of reidentification
 # note that this assumes that missing values aren't factored in for k-anon, to make them count as wildcards, adjust the alpha parameter to what percent you want them to count as wildcards
@@ -109,7 +109,7 @@ sdcObj <- createSdcObj(dat=data,
 sdc_print(sdcObj, KANON_LEVEL)
 
 #this should be zero
-fk <- summarize_violations(data2, sdcObj, KANON_LEVEL, quasi_identifiers)
+fk <- summarize_violations(data, sdcObj, KANON_LEVEL, quasi_identifiers)
 
 # not actually performing suppression, but if needed to help debug uncomment below to generate an sdcmicro suppressed file
 #sdcObj <- kAnon(sdcObj, importance=c(1,1,1,1,1,1,2), combs=NULL, k=c(KANON_LEVEL))
@@ -119,12 +119,51 @@ cat("Writing out a privacy eval report to:", paste(report_dir,"/",file_name,".ht
 report(sdcObj, outdir = report_dir, filename = file_name,
        title = "SRRG Privacy Evaluation Report for Case Surveillance Public Data Set with Geography", internal = TRUE, verbose = FALSE)
 
-#TODO check for small county populations (rule #3)
+cat('Processing check for low population counties (rule #3), should be 0.\n')
 
-county_data = read.csv(COUNTY_POP_FILE_NAME, fileEncoding="UTF-8-BOM", na.strings=c('NA',''))
+county_data = read.csv(COUNTY_POP_FILE_NAME, fileEncoding="UTF-8-BOM", na.strings=c('NA',''),colClasses=c("state_county_combined_fips"="character"))
+names(county_data)[names(county_data) == 'state_county_combined_fips'] <- 'county_fips_code'
+names(county_data) <- tolower(names(county_data))
+county_data['state_abbr'] = state.abb[match(county_data$stname,state.name)]
+
+data_with_census = merge(x=data, y=county_data, by = 'county_fips_code', all.x = TRUE)
+
+#if I screw up the merge, that's bad
+stopifnot(nrow(data) == nrow(data_with_census))
+
+#missing census data, assume zero population, so we check if suppressed
+data_with_census$sum_of_tot_pop[is.na(data_with_census$sum_of_tot_pop)] <- 0
+
+violations <- subset(data_with_census, sum_of_tot_pop < COUNTY_POPULATION_LEVEL & res_county != "NA")
+num_v = nrow(violations)
+cat("Low population county violations (",num_v,"). If greater than zero violations, then the list of counties with violations and 5 sample violations.\n")
+if (num_v > 0){
+  print(unique(violations$res_county))
+  print(violations[sample(num_v,5),c(quasi_identifiers, 'sum_of_tot_pop')])
+}
 
 #TODO check for small subpopulations (rule #4)
 
 #TODO check for cases higher than subpopulation (rule #5)
 
-#TODO check for county/state complementary (rule #10)
+cat('\n\nProcessing check for county/state complementary offsets (rule #10), should be 0.\n')
+
+census_counties_per_state = aggregate(data=county_data, ctyname ~ state_abbr, function(x) length(unique(x)))
+names(census_counties_per_state) <- c('census_state','census_num_counties')
+case_counties_per_state = aggregate(data=subset(data_with_census,county_fips_code != 'NA'), county_fips_code ~ res_state, function(x) length(unique(x)))
+names(case_counties_per_state)[names(case_counties_per_state) == 'county_fips_code'] <- 'case_num_counties'
+names(case_counties_per_state) <- c('case_state','case_num_counties')
+
+combined_counties_per_state = merge(x=case_counties_per_state, y=census_counties_per_state, by.x = 'case_state', by.y = 'census_state', all.x = TRUE)
+combined_counties_per_state['county_diff'] = combined_counties_per_state['census_num_counties'] - combined_counties_per_state['case_num_counties']
+
+violations <- subset(combined_counties_per_state, county_diff == 1)
+num_v = nrow(violations)
+cat("County/state complementary violations (",num_v,"). If greater than zero violations, then here's states with violations.\n")
+if (num_v > 0){
+  print(violations)
+}
+
+#debug to look at states that break rule
+#unique(subset(data_with_census,county_fips_code != 'NA' & res_state=='AK')$county_fips_code)
+

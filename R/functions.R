@@ -194,7 +194,7 @@ quick_summary <-function(data, label="fields", qis=NULL, print=TRUE){
 
 #print out info on any linked variable violations. Like if state is suppressed but county isn't. This should never happen, but want to check just in case.
 summarize_linked_attribute_violations <- function(data, linked_attributes){
-  cat('Processing checks for linked fields (',unlist(linked_attributes),')')
+  cat('Processing checks for linked fields (',unlist(linked_attributes),')\n')
   for (link in linked_attributes){
     source_field = link[[1]]
     linked_fields = link[[2]]
