@@ -26,7 +26,7 @@
             "https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html"
         ],
         "methods": "generate_census_pop_for_case_suppression_checks",
-        "described_by": "https://www2.census.gov/programs-surveys/popest/technical-documentation/file-layouts/2010-2019/cc-est2019-agesex.pdf",
+        "described_by": "https://www2.census.gov/programs-surveys/popest/technical-documentation/file-layouts/2010-2019/cc-est2019-alldata.pdf",
         "fields": [
             "state_county_combined_fips",
             "STNAME",
