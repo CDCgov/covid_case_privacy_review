@@ -335,3 +335,266 @@ permutatotions <- function(demo_qis,prefix_qis = NULL){
 read_parquet_parts <- function(glob){
   data.table::rbindlist(lapply(Sys.glob(glob), arrow::read_parquet))
 }
+
+# checks a particular row in a case record merged to census for the sex, race, or ethnicity subpopulation total
+# so it can be checked if under 220
+# returns integer value, or maybe -1 or NA/NaN
+what_subpopulation_value <- function(row){
+  blank_categories = c('NA','Missing','Unknown')
+
+  race = toString(row['race'])
+  ethnicity = toString(row['ethnicity'])
+  sex = toString(row['sex'])
+  census_pop_field = NA
+  census_subpopulation = -1
+  #the idea here is to figure out what combo from census is needed to check, we want to only use the field that's appropriate based on the missing demo fields
+  if( race == 'White'){
+    if(ethnicity == 'Hispanic/Latino'){
+      if (sex == 'Male'){
+        census_pop_field = 'sum_of_hwa_male'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else if (sex == 'Female'){
+        census_pop_field = 'sum_of_hwa_female'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else{#is.element(sex, blank_categories)){}
+        census_pop_field = 'sum_of_hwa_male+sum_of_hwa_female'
+        census_subpopulation = as.integer(row['sum_of_hwa_male']) + as.integer(row['sum_of_hwa_female'])
+      }
+    }else if(ethnicity == 'Non-Hispanic/Latino'){
+      if (sex == 'Male'){
+        census_pop_field = 'sum_of_nhwa_male'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else if (sex == 'Female'){
+        census_pop_field = 'sum_of_nhwa_female'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else{#is.element(sex, blank_categories)){}
+        census_pop_field = 'sum_of_nhwa_male+sum_of_nhwa_female'
+        census_subpopulation = as.integer(row['sum_of_nhwa_male']) + as.integer(row['sum_of_nhwa_female'])
+      }
+    } else {#is.element(ethnicity, blank_categories)){
+      if (sex == 'Male'){
+        census_pop_field = 'sum_of_wa_male'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else if (sex == 'Female'){
+        census_pop_field = 'sum_of_wa_female'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else{#is.element(sex, blank_categories)){}
+        census_pop_field = 'sum_of_wa_male+sum_of_wa_female'
+        census_subpopulation = as.integer(row['sum_of_wa_male']) + as.integer(row['sum_of_wa_female'])
+      }
+    }
+  }else if (race == 'Black'){
+    if(ethnicity == 'Hispanic/Latino'){
+      if (sex == 'Male'){
+        census_pop_field = 'sum_of_hba_male'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else if (sex == 'Female'){
+        census_pop_field = 'sum_of_hba_female'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else{#is.element(sex, blank_categories)){}
+        census_pop_field = 'sum_of_hba_male+sum_of_hba_female'
+        census_subpopulation = as.integer(row['sum_of_hba_male']) + as.integer(row['sum_of_hba_female'])
+      }
+    }else if(ethnicity == 'Non-Hispanic/Latino'){
+      if (sex == 'Male'){
+        census_pop_field = 'sum_of_nhba_male'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else if (sex == 'Female'){
+        census_pop_field = 'sum_of_nhba_female'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else{#is.element(sex, blank_categories)){}
+        census_pop_field = 'sum_of_nhba_male+sum_of_nhba_female'
+        census_subpopulation = as.integer(row['sum_of_nhba_male']) + as.integer(row['sum_of_nhba_female'])
+      }
+    } else {#is.element(ethnicity, blank_categories)){
+      if (sex == 'Male'){
+        census_pop_field = 'sum_of_ba_male'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else if (sex == 'Female'){
+        census_pop_field = 'sum_of_ba_female'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else{#is.element(sex, blank_categories)){}
+        census_pop_field = 'sum_of_ba_male+sum_of_ba_female'
+        census_subpopulation = as.integer(row['sum_of_ba_male']) + as.integer(row['sum_of_ba_female'])
+      }
+    }
+  }else if (race == 'American Indian/Alaska Native'){
+    if(ethnicity == 'Hispanic/Latino'){
+      if (sex == 'Male'){
+        census_pop_field = 'sum_of_hia_male'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else if (sex == 'Female'){
+        census_pop_field = 'sum_of_hia_female'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else{#is.element(sex, blank_categories)){}
+        census_pop_field = 'sum_of_hia_male+sum_of_hia_female'
+        census_subpopulation = as.integer(row['sum_of_hia_male']) + as.integer(row['sum_of_hia_female'])
+      }
+    }else if(ethnicity == 'Non-Hispanic/Latino'){
+      if (sex == 'Male'){
+        census_pop_field = 'sum_of_nhia_male'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else if (sex == 'Female'){
+        census_pop_field = 'sum_of_nhia_female'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else{#is.element(sex, blank_categories)){}
+        census_pop_field = 'sum_of_nhia_male+sum_of_nhia_female'
+        census_subpopulation = as.integer(row['sum_of_nhia_male']) + as.integer(row['sum_of_nhia_female'])
+      }
+    } else {#is.element(ethnicity, blank_categories)){
+      if (sex == 'Male'){
+        census_pop_field = 'sum_of_ia_male'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else if (sex == 'Female'){
+        census_pop_field = 'sum_of_ia_female'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else{#is.element(sex, blank_categories)){}
+        census_pop_field = 'sum_of_ia_male+sum_of_ia_female'
+        census_subpopulation = as.integer(row['sum_of_ia_male']) + as.integer(row['sum_of_ia_female'])
+      }
+    }
+  }else if (race == 'Asian'){
+    if(ethnicity == 'Hispanic/Latino'){
+      if (sex == 'Male'){
+        census_pop_field = 'sum_of_haa_male'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else if (sex == 'Female'){
+        census_pop_field = 'sum_of_haa_female'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else{#is.element(sex, blank_categories)){}
+        census_pop_field = 'sum_of_haa_male+sum_of_haa_female'
+        census_subpopulation = as.integer(row['sum_of_haa_male']) + as.integer(row['sum_of_haa_female'])
+      }
+    }else if(ethnicity == 'Non-Hispanic/Latino'){
+      if (sex == 'Male'){
+        census_pop_field = 'sum_of_nhaa_male'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else if (sex == 'Female'){
+        census_pop_field = 'sum_of_nhaa_female'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else{#is.element(sex, blank_categories)){}
+        census_pop_field = 'sum_of_nhaa_male+sum_of_nhaa_female'
+        census_subpopulation = as.integer(row['sum_of_nhaa_male']) + as.integer(row['sum_of_nhaa_female'])
+      }
+    } else {#is.element(ethnicity, blank_categories)){
+      if (sex == 'Male'){
+        census_pop_field = 'sum_of_aa_male'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else if (sex == 'Female'){
+        census_pop_field = 'sum_of_aa_female'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else{#is.element(sex, blank_categories)){}
+        census_pop_field = 'sum_of_aa_male+sum_of_aa_female'
+        census_subpopulation = as.integer(row['sum_of_aa_male']) + as.integer(row['sum_of_aa_female'])
+      }
+    }
+  }else if (race == 'Native Hawaiian/Other Pacific Islander'){
+    if(ethnicity == 'Hispanic/Latino'){
+      if (sex == 'Male'){
+        census_pop_field = 'sum_of_hna_male'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else if (sex == 'Female'){
+        census_pop_field = 'sum_of_hna_female'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else{#is.element(sex, blank_categories)){}
+        census_pop_field = 'sum_of_hna_male+sum_of_hna_female'
+        census_subpopulation = as.integer(row['sum_of_hna_male']) + as.integer(row['sum_of_hna_female'])
+      }
+    }else if(ethnicity == 'Non-Hispanic/Latino'){
+      if (sex == 'Male'){
+        census_pop_field = 'sum_of_nhna_male'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else if (sex == 'Female'){
+        census_pop_field = 'sum_of_nhna_female'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else{#is.element(sex, blank_categories)){}
+        census_pop_field = 'sum_of_nhna_male+sum_of_nhna_female'
+        census_subpopulation = as.integer(row['sum_of_nhna_male']) + as.integer(row['sum_of_nhna_female'])
+      }
+    } else {#is.element(ethnicity, blank_categories)){
+      if (sex == 'Male'){
+        census_pop_field = 'sum_of_na_male'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else if (sex == 'Female'){
+        census_pop_field = 'sum_of_na_female'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else{#is.element(sex, blank_categories)){}
+        census_pop_field = 'sum_of_na_male+sum_of_na_female'
+        census_subpopulation = as.integer(row['sum_of_na_male']) + as.integer(row['sum_of_na_female'])
+      }
+    }
+  }else if (race == 'Multiple/Other'){
+    if(ethnicity == 'Hispanic/Latino'){
+      if (sex == 'Male'){
+        census_pop_field = 'sum_of_htom_male'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else if (sex == 'Female'){
+        census_pop_field = 'sum_of_htom_female'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else{#is.element(sex, blank_categories)){}
+        census_pop_field = 'sum_of_htom_male+sum_of_htom_female'
+        census_subpopulation = as.integer(row['sum_of_htom_male']) + as.integer(row['sum_of_htom_female'])
+      }
+    }else if(ethnicity == 'Non-Hispanic/Latino'){
+      if (sex == 'Male'){
+        census_pop_field = 'sum_of_nhtom_male'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else if (sex == 'Female'){
+        census_pop_field = 'sum_of_nhtom_female'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else{#is.element(sex, blank_categories)){}
+        census_pop_field = 'sum_of_nhtom_male+sum_of_nhtom_female'
+        census_subpopulation = as.integer(row['sum_of_nhtom_male']) + as.integer(row['sum_of_nhtom_female'])
+      }
+    } else {#is.element(ethnicity, blank_categories)){
+      if (sex == 'Male'){
+        census_pop_field = 'sum_of_tom_male'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else if (sex == 'Female'){
+        census_pop_field = 'sum_of_tom_female'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else{#is.element(sex, blank_categories)){}
+        census_pop_field = 'sum_of_tom_male+sum_of_tom_female'
+        census_subpopulation = as.integer(row['sum_of_tom_male']) + as.integer(row['sum_of_tom_female'])
+      }
+    }
+  }else{#is.element(race, blank_categories)){
+    if(ethnicity == 'Hispanic/Latino'){
+      if (sex == 'Male'){
+        census_pop_field = 'sum_of_h_male'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else if (sex == 'Female'){
+        census_pop_field = 'sum_of_h_female'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else{#is.element(sex, blank_categories)){}
+        census_pop_field = 'sum_of_h_male+sum_of_h_female'
+        census_subpopulation = as.integer(row['sum_of_h_male']) + as.integer(row['sum_of_h_female'])
+      }
+    }else if(ethnicity == 'Non-Hispanic/Latino'){
+      if (sex == 'Male'){
+        census_pop_field = 'sum_of_nh_male'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else if (sex == 'Female'){
+        census_pop_field = 'sum_of_nh_female'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else{#is.element(sex, blank_categories)){}
+        census_pop_field = 'sum_of_nh_male+sum_of_nh_female'
+        census_subpopulation = as.integer(row['sum_of_nh_male']) + as.integer(row['sum_of_nh_female'])
+      }
+    } else {#is.element(ethnicity, blank_categories)){
+      if (sex == 'Male'){
+        census_pop_field = 'sum_of_tot_male'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }else if (sex == 'Female'){
+        census_pop_field = 'sum_of_tot_female'
+        census_subpopulation = as.integer(row[census_pop_field])
+        # I suppose if all three demos are blank we don't need to check since all counties with total population < 220 will have already be NA'd out by rule3, but this makes for a single calculation below no matter what combo
+      }else{#is.element(sex, blank_categories)){}
+        census_pop_field = 'sum_of_tot_pop'
+        census_subpopulation = as.integer(row[census_pop_field])
+      }
+    }
+  }
+
+  census_subpopulation
+}
