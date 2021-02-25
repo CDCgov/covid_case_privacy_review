@@ -1,7 +1,7 @@
 [
     {
         "data_source": "county_pop_demo_for_verify",
-        "description": "Census county populations by sex, race, ethnicity summed for all ages using the 2018 intercensal estimates. Specifically made to be joinable to public case surveillance dataset with geography to verify privacy protections. Pretty specialized format that you probably don't want to reuse and should just go back to census source.",
+        "description": "Census county populations by sex, race, ethnicity summed for all ages using the 2019 intercensal estimates. Specifically made to be joinable to public case surveillance dataset with geography to verify privacy protections. Pretty specialized format that you probably don't want to reuse and should just go back to census source.",
         "data_owner": "Census",
         "data_custodian": "OCIO-OD",
         "contact": "brian.lee@cdc.gov",
@@ -17,12 +17,12 @@
         "fair_score": "0111",
         "format": "csv",
         "time_period": {
-            "min": "2018-07-01",
-            "max": "2018-07-01"
+            "min": "2019-07-01",
+            "max": "2019-07-01"
         },
         "address": "https://github.com/CDCgov/covid_case_privacy_review/blob/master/data/raw/county_pop_demo_for_verify.csv",
         "upstream": [
-            "HHSProtect's county_pop_by_characteristic",
+            "HHSProtect's county_populations_2010_2019",
             "https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html"
         ],
         "methods": "generate_census_pop_for_case_suppression_checks",
@@ -75,10 +75,10 @@
             "SUM_of_NHTOM_MALE",
             "SUM_of_NHTOM_FEMALE"
         ],
-        "data_hash": "SHA256(county_pop_demo_for_verify.csv)= 03b7756118e5a8014428abac2acaa5d4928ba79fc4d323f56d3d0c67804a3d2a",
-        "metadata_generated": "2021-02-09",
-        "data_size_on_disk": 621303,
-        "created_date": "2021-02-09",
+        "data_hash": "SHA256(county_pop_demo_for_verify.csv)= ce3da19a72183c889a10f3bd8dcdedda06cc8c08ca6982526620276cf4d02989",
+        "metadata_generated": "2021-02-25",
+        "data_size_on_disk": 622202,
+        "created_date": "2021-02-25",
         "record_count": 3142,
         "accessLevel": "Public",
         "sensititivy": "N/A"

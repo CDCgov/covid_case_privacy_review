@@ -171,8 +171,6 @@ if (num_v > 0){
   print(violations[sample(num_v,5),])
 }
 
-#TODO check for cases higher than subpopulation (rule #5)
-
 cat('\n\nProcessing check for case counts by subpopulation (rule #5), should be 0.\n')
 
 #aggregate by county fips, sex, race, ethnicity
@@ -212,7 +210,4 @@ if (num_v > 0){
 }
 
 #debug stuff
-
-
-
 

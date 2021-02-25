@@ -83,7 +83,7 @@ No confidential attributes are in this dataset.
 To run these scripts, copy in or symlik a data file to the `data/raw` folder, update the script with the name of the data file, run from the `R` folder of this project. This script will generate output to the console and create a privacy report in the `reports` folder.
 
 * [R/review_public.R](R/review_public.R) - to review the public12 file
-* [R/review_public_countyjan.R](R/review_public_countyjan.R) - to review the public19 file
+* [R/review_public_geo.R](R/review_public_geo.R) - to review the public19 file
 
 ## Interpreting output
 
