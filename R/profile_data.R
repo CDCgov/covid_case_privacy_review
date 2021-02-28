@@ -15,10 +15,10 @@ report_dir = "../reports"
 data_dir = "../data/raw"
 
 # change these depending on the current data set...
-report_file_name <- "COVID_Cases_Public_Limited_01312021_profile.html"
-report_title <- "COVID-19 Case Surveillance Public Use Data Profile (2021-01-31▼ version)"
+report_file_name <- "COVID_Cases_Public_Limited_20210228_profile.html"
+report_title <- "COVID-19 Case Surveillance Public Use Data Profile (2021-02-28▼ version)"
 
-file_name <- "COVID_Cases_Public_Limited_01312021.csv"
+file_name <- "COVID_Cases_Public_Limited_20210228.csv"
 detailed_file_name <- paste(data_dir,"/",file_name,sep="")
 
 cat("Processing file:", detailed_file_name,"\n\n")
@@ -36,6 +36,10 @@ for (field in date_fields){
 }
 
 str(data)
+# MAX - Latest - date:
+head(data %>% distinct(cdc_case_earliest_dt) %>% arrange(desc(cdc_case_earliest_dt)))
+# Min Date:
+head(data %>% distinct(cdc_case_earliest_dt) %>% arrange(cdc_case_earliest_dt))
 
 # output_format = "github_document", output_file = "profile.md" for outputting markdown version
 
