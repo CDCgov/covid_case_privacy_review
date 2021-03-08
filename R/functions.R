@@ -1,5 +1,7 @@
 # shared functions used for privacy reviews
 
+BLANK_CATEGORIES = c('NA','Missing','Unknown')
+
 percent <- function(x, digits = 2, format = "f", ...) {
   paste0(formatC(x * 100, format = format, digits = digits, ...), "%")
 }
@@ -27,7 +29,6 @@ ldiversity_hack <- function(df,sensitive_var){
   new = merge(agg,data_copy)
   new
 }
-
 
 #print out a summary of an sdc object the way I like it
 #out: nothing return, just cats and prints to console
@@ -300,7 +301,6 @@ manual_k_suppress <- function(data,qis,k){
     }
     #summmarize_utility(working_data, qis)
   }
-
 
   list("results"=results,"suppressed_data"=working_data)
 
@@ -598,3 +598,19 @@ what_subpopulation_value <- function(row){
 
   census_subpopulation
 }
+
+# Copies and recodes columns in a dataframe to NA
+# returns a dataframe with all the specified columns recoded to NA
+recode_to_na <- function(data, columns_to_recode, values_to_recode=BLANK_CATEGORIES){
+  data_na <- data.frame(data)
+
+  for (column in columns_to_recode){
+    data_na[[column]][is.element(data_na[[column]],values_to_recode)] <- NA
+  }
+
+  data_na
+}
+#test code, uncomment to run, after should be much smaller
+#apply(data[quasi_identifiers],2,unique)
+#data_foo <- recode_to_na(data,quasi_identifiers,BLANK_CATEGORIES)
+#apply(data_foo[quasi_identifiers],2,unique)

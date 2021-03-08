@@ -6,15 +6,17 @@
 #   k-anonymity 11 for all quasi-identifiers (#6)
 #   confirming suppression of linked variables (#7,8,9)
 #   confirming suppression where only one county in a state is suppressed (#10)
-#   if we had confidential variables we would check for l-diversity
+#   if we had confidential variables we would check for l-diversity, but we don't, so we don't
 
-# actual supression logic is in HHSProtect code repository, this script confirms that files are meeting privacy rules to reduce risk of reidentification
+# actual suppression logic is in HHSProtect code repository, this script confirms that files are meeting privacy rules to reduce risk of reidentification
 # note that this assumes that missing values aren't factored in for k-anon, to make them count as wildcards, adjust the alpha parameter to what percent you want them to count as wildcards
 
-# census file is processed in Protect based on https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html using the 2018 estimates for consistency with other parts of the response, version stored in repo is the summed and formatted version to make life easier. If we start using year other than 2018, then regenerate and update in repo.
+# census file is processed in Protect based on https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html using the 2019 estimates for consistency with other parts of the response, version stored in repo is the summed and formatted version to make life easier. If we start using year other than 2019, then regenerate and update in repo.
 
 #sdcApp(maxRequestSize = 2000)
 #View(data)
+
+cat(toString(Sys.time()))
 
 source("functions.R")
 
@@ -39,7 +41,7 @@ COUNTY_DEMO_POPULATION_LEVEL
 COUNTY_POP_FILE_NAME = paste0(data_dir,"/county_pop_demo_for_verify.csv")
 
 location_quasi_identifiers = c("res_state","res_county")
-quasi_identifiers = c("case_month", location_quasi_identifiers, "age_group","sex","race","ethnicity")
+quasi_identifiers = c("case_month", location_quasi_identifiers, "age_group","sex","race","ethnicity","death_yn")
 confidential_attributes = c()
 #in some cases where attributes are related, we want to suppress the linked attribute whenever the source is suppressed. Using this format as that's what sdcmicro expects for ghostVars
 linked_attributes = list(
@@ -48,7 +50,7 @@ linked_attributes = list(
   )
 
 #if I use a CSV then there's logic to change down below
-file_name <- "public_county_geography_2020-02-19.parquet"
+file_name <- "public_county_geography_2020-03-05.parquet"
 suppressed_file_name = paste(out_dir,"/",file_name,".suppressed.csv",sep="")
 detailed_file_name = paste(data_dir,"/",file_name,sep="")
 print(detailed_file_name)
@@ -69,10 +71,21 @@ summarize_linked_attribute_violations(data, linked_attributes)
 
 # review for locations first (rules #1,2)
 
-#NA as a category value identified states with <1000 NA and we don't care about that
-data2 = data.frame(data)
-data2[data2=="NA"] <- NA
-sdcObj <- createSdcObj(dat=data2,
+cat('\n\nProcessing check for states and counties having at least 1,000 cases (rules #1,2), should be 0.\n')
+
+#recoding all the "NA" (already suppressed), Missings and Unknowns to NA for purposes of k-anonymity
+data_na <- recode_to_na(data,quasi_identifiers,BLANK_CATEGORIES)
+
+#data_na$res_state[is.element(data_na$res_state,BLANK_CATEGORIES)] <- NA
+#data_na$res_county[is.element(data_na$res_county,BLANK_CATEGORIES)] <- NA
+#data_na$case_month[is.element(data_na$case_month,BLANK_CATEGORIES)] <- NA
+#data_na$age_group[is.element(data_na$age_group,BLANK_CATEGORIES)] <- NA
+#data_na$sex[is.element(data_na$sex,BLANK_CATEGORIES)] <- NA
+#data_na$race[is.element(data_na$race,BLANK_CATEGORIES)] <- NA
+#data_na$ethnicity[is.element(data_na$ethnicity,BLANK_CATEGORIES)] <- NA
+#data_na$death_yn[is.element(data_na$death_yn,BLANK_CATEGORIES)] <- NA
+
+sdcObj <- createSdcObj(dat=data_na,
                        keyVars=location_quasi_identifiers,
                        numVars=NULL,
                        weightVar=NULL,
@@ -89,10 +102,11 @@ sdcObj <- createSdcObj(dat=data2,
 sdc_print(sdcObj, KANON_LEVEL_LOCATION)
 
 #should be zero
-fk = summarize_violations(data2, sdcObj, KANON_LEVEL_LOCATION, location_quasi_identifiers)
+fk = summarize_violations(data_na, sdcObj, KANON_LEVEL_LOCATION, location_quasi_identifiers)
 
 #now lets check for k-anonymity using full quasi-identifier set (rule #6)
-sdcObj <- createSdcObj(dat=data,
+cat('\n\nProcessing check for k-anonymity 11 across all quasi-identifiers (rule #6), should be 0.\n')
+sdcObj <- createSdcObj(dat=data_na,
                        keyVars=quasi_identifiers,
                        numVars=NULL,
                        weightVar=NULL,
@@ -102,20 +116,20 @@ sdcObj <- createSdcObj(dat=data,
                        excludeVars=NULL,
                        seed=0,
                        randomizeRecords=FALSE,
-                       alpha=c(0),
+                       alpha=c(1), #changing to 1 so nulls are treated as wildcards instead of categorical, this is new for geo because of the number of quasi-identifiers and wanting to improve accuracy of suppression to meet privacy threshold
                        ghostVars = NULL)
 
 # print to confirm observations, num variales, quasis, quasi describes, and risk info
 sdc_print(sdcObj, KANON_LEVEL)
 
 #this should be zero
-fk <- summarize_violations(data, sdcObj, KANON_LEVEL, quasi_identifiers)
+fk <- summarize_violations(data_na, sdcObj, KANON_LEVEL, quasi_identifiers)
 
 # not actually performing suppression, but if needed to help debug uncomment below to generate an sdcmicro suppressed file
 #sdcObj <- kAnon(sdcObj, importance=c(1,1,1,1,1,1,2), combs=NULL, k=c(KANON_LEVEL))
 #writeSafeFile(sdcObj,"csv","simple",suppressed_file_name, quote=FALSE, sep=",",row.names=FALSE)
 
-cat("Writing out a privacy eval report to:", paste(report_dir,"/",file_name,".html",sep = ""),"\n\n")
+cat("\n\nWriting out a privacy eval report to:", paste(report_dir,"/",file_name,".html",sep = ""),"\n\n")
 report(sdcObj, outdir = report_dir, filename = file_name,
        title = "SRRG Privacy Evaluation Report for Case Surveillance Public Data Set with Geography", internal = TRUE, verbose = FALSE)
 
@@ -209,5 +223,8 @@ if (num_v > 0){
   print(violations)
 }
 
+cat(toString(Sys.time()))
+
 #debug stuff
+
 
