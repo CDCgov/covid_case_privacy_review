@@ -5,6 +5,7 @@ BLANK_CATEGORIES = c('NA','Missing','Unknown')
 percent <- function(x, digits = 2, format = "f", ...) {
   paste0(formatC(x * 100, format = format, digits = digits, ...), "%")
 }
+
 commas <- function(x){
   formatC(x, big.mark=",")
 }

@@ -50,13 +50,14 @@ linked_attributes = list(
   )
 
 #if I use a CSV then there's logic to change down below
-file_name <- "public_county_geography_2020-03-05.parquet"
+file_name <- "public_county_geography_2020-03-22.parquet"
 suppressed_file_name = paste(out_dir,"/",file_name,".suppressed.csv",sep="")
 detailed_file_name = paste(data_dir,"/",file_name,sep="")
 print(detailed_file_name)
 
 #data = read.csv(detailed_file_name, fileEncoding="UTF-8-BOM", na.strings=c('NA',''))
 df = read_parquet(detailed_file_name, as_data_frame = TRUE)
+#df = read_parquet_parts(detailed_file_name) #
 #for some reason the dataframe from arrow makes sdc take forever and error, but if I make a new dataframe it works, todo figure it out
 data <- data.frame(df)
 
@@ -75,15 +76,6 @@ cat('\n\nProcessing check for states and counties having at least 1,000 cases (r
 
 #recoding all the "NA" (already suppressed), Missings and Unknowns to NA for purposes of k-anonymity
 data_na <- recode_to_na(data,quasi_identifiers,BLANK_CATEGORIES)
-
-#data_na$res_state[is.element(data_na$res_state,BLANK_CATEGORIES)] <- NA
-#data_na$res_county[is.element(data_na$res_county,BLANK_CATEGORIES)] <- NA
-#data_na$case_month[is.element(data_na$case_month,BLANK_CATEGORIES)] <- NA
-#data_na$age_group[is.element(data_na$age_group,BLANK_CATEGORIES)] <- NA
-#data_na$sex[is.element(data_na$sex,BLANK_CATEGORIES)] <- NA
-#data_na$race[is.element(data_na$race,BLANK_CATEGORIES)] <- NA
-#data_na$ethnicity[is.element(data_na$ethnicity,BLANK_CATEGORIES)] <- NA
-#data_na$death_yn[is.element(data_na$death_yn,BLANK_CATEGORIES)] <- NA
 
 sdcObj <- createSdcObj(dat=data_na,
                        keyVars=location_quasi_identifiers,
@@ -119,7 +111,7 @@ sdcObj <- createSdcObj(dat=data_na,
                        alpha=c(1), #changing to 1 so nulls are treated as wildcards instead of categorical, this is new for geo because of the number of quasi-identifiers and wanting to improve accuracy of suppression to meet privacy threshold
                        ghostVars = NULL)
 
-# print to confirm observations, num variales, quasis, quasi describes, and risk info
+# print to confirm observations, num variables, quasis, quasi describes, and risk info
 sdc_print(sdcObj, KANON_LEVEL)
 
 #this should be zero

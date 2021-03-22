@@ -1,6 +1,6 @@
 # COVID-19 Case Privacy Review
 
-This project contains the procedures used by the Surveillance Review and Response Group to review and verify that data sets include privacy protection controls and meet the defined k-anonymity and l-diversity thresholds established by the covid response.
+This project contains the procedures used by the Data, Analytics, Visualization Task Force to review and verify that data sets include privacy protection controls and meet the defined k-anonymity and l-diversity thresholds established by the covid response.
 
 ## Issues, questions, problems, suggestions
 
@@ -8,20 +8,31 @@ If you have any of the above, please [submit an issue on github](https://github.
 
 ## Requires
 
+* R version >= 4.0.3 (although I suspect, but have not tested >=3.5)
 * [sdcMicro](https://cran.r-project.org/web/packages/sdcMicro/index.html) version >= 5.5.1
 * [arrow](https://cran.r-project.org/web/packages/arrow/index.html) version >= 2.0.0
-* R version >= 4.0.3 (although I suspect, but have not tested >=3.5)
+* [renv](https://cran.r-project.org/web/packages/renv/index.html) >= 0.12.3
 * optional for profiling
   * [DataExplorer](https://cran.r-project.org/web/packages/DataExplorer/index.html) >=0.8.2
-  * [Hmisc](https://cran.r-project.org/web/packages/Hmisc/index.html) >=4.4-2
-  * [inspectdf](https://cran.r-project.org/web/packages/inspectdf/index.html) >=0.0.9
-  * [dplyr](https://cran.r-project.org/web/packages/dplyr/index.html) >= 1.0.2
+
+## Install & run procedures
+
+`renv::restore()` to install necessary packages
+
+Then in or symlik a data file to the `data/raw` folder, update the script with the name of the data file, run from the `R` folder of this project. This script will generate output to the console and create a privacy report in the `reports` folder.
+
+* [R/review_public.R](R/review_public.R) - to review the public12 file
+* [R/review_public_geo.R](R/review_public_geo.R) - to review the public19 file
+
+`renv:snapshot()` to update renv.lock with any changes made to dependencies
 
 ## Description
 
-These scripts are part of a two step process for statistical disclosure control implementation. These scripts do not directly perform suppression or modify any data, but are a separate step to validate that the data generation pipeline- implemented in CDC's Palantir software- generates the data file so that it meets all the privacy protection requirements.
+These scripts are part of a two step process for statistical disclosure control implementation. These scripts do not directly perform suppression or modify any data, but are a separate step to validate that the data generation pipeline - implemented in HHSProtect as a Palantir code repository - that generates the data file so that it meets all the privacy protection requirements.
 
-Data files are not contained in this repo and must be fetched independently and placed into the `data/raw` folder for review. The public use file can be retrieved from [data.cdc.gov](https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data/vbim-akqf).
+Data files are not contained in this repo and must be fetched independently and placed into the `data/raw` folder for review. The public use files can be retrieved from Data.CDC.gov:
+* [COVID-19 Case Surveillance Public Use Data](https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data/vbim-akqf)
+* [COVID-19 Case Surveillance Public Use Data with Geography](https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4)
 
 K-anonymity is a technique to release person-specific data such that the ability to link to other information using the quasi-identifier is limited. Each person contained in the released data cannot be distinguished from at least k-1 other persons who share the same quasi identifiers. For example, a dataset is considered 5-anonymous it means that the smallest number of cells that share the same quasi-identifiers is 5. 
 
@@ -33,9 +44,9 @@ These thresholds are applied to the quasi-identifiers and confidential variables
 
 We are working to improve these privacy procedures over time and welcome feedback and improvements submitted to this project as issues or pull requests.
 
-## Data file characteristics - Public12
+## Data file characteristics - "COVID-19 Case Surveillance Public Use Data"
 
-The public use data file for "COVID-19 Case Surveillance Public Use Data" checks its 12 variables for...
+Checks its 12 variables for...
 
 ### Quasi-identifiers (3)
 
@@ -49,15 +60,11 @@ Checked for k=5
 
 * pos_spec_dt
 
-## Data file charateristics - CountyJan
+## Data file characteristics - "COVID-19 Case Surveillance Public Use Data with Geography"
 
-The public use data file for "COVID-19 Case Surveillance Public Use Data with Geography" checks its 19 variables for...
+Checks its 19 variables for...
 
-### Population level
-
-Checking county population and res_county should never be populated if the county population (by fips code) is under 20k.
-
-### Quasi-identifiers (7)
+### Quasi-identifiers (8)
 
 Checked for k=1000
 
@@ -73,38 +80,44 @@ Checked for k=11
 * sex 
 * race
 * ethnicity
+* death_yn
+
+### Population level and geography specific checks
+
+* Checking county population and res_county should never be populated if the county population (by fips code) is under 20k.
+* Checking that sex, race, ethnicity demographic values should never be populated with the county subpopulation by those demographics is under 220 (k*20).
+* Checking for case county by sex, race, ethnicity in a county is never higher than 50% of the subpopulation by those demographics for the county.
+* Checking that there is never a situation where only a single county within a state is suppressed, allowing the state to be deduced by process of elimination.
+* Checks that if res_state is suppressed, then res_county should also be suppressed.
+* FIPS code fields are associated with quasi-identifiers so they are checked to make sure that they are always suppressed when corressponding fields are suppressed.
+  * state_fips_code, suppressed when res_state is suppressed
+  * county_fips_code, suppressed when res_state is suppressed
 
 ### Confidential attributes
 
 No confidential attributes are in this dataset.
 
-## Run procedures
-
-To run these scripts, copy in or symlik a data file to the `data/raw` folder, update the script with the name of the data file, run from the `R` folder of this project. This script will generate output to the console and create a privacy report in the `reports` folder.
-
-* [R/review_public.R](R/review_public.R) - to review the public12 file
-* [R/review_public_geo.R](R/review_public_geo.R) - to review the public19 file
-
 ## Interpreting output
 
 This script uses the [sdcMicro](https://cran.r-project.org/web/packages/sdcMicro/) package so much of the output is generated from this package. What we look for is the specific output `linked variable violations ( 0 )`, `k-anon violations ( 0 )`, and `< 0 > l-diversity violations`. If any violations are found then the file is not ready for publication, notify the data team so they can fix the data pipeline.
 
+For the geography checks, there are multiple steps, so output should be reviewed to confirm that all steps have completed without identifying an violations that require correction prior to publishing:
+* `linked variable violations ( 0 ) `
+* `k-anon violations ( 0 ) for k=( 1000 ) and quasi-identifiers ( res_state res_county )`
+* `k-anon violations ( 0 ) for k=( 11 ) and quasi-identifiers ( case_month res_state res_county age_group sex race ethnicity death_yn )`
+* `Low population county violations ( 0 )`
+* `Subpopulation county violations, part 1 checking subpopulation for counties ( 0 )`
+* `Subpopulation county violations, part 2, checking to make sure there aren't any res_county that aren't NA but have subpops ( 0 )`
+* `Subpopulation population too small for cases ( 0 )`
+* `County/state complementary violations ( 0 )`
+
 For convenience, a portion of this output is stored in `reports/log.md` to compare results on previous versions of the dataset.
 
-## Helper scripts
+## Helper files
 
-This project also includes a script called `profile_data.R` that uses the [DataExplorer](https://www.rdocumentation.org/packages/DataExplorer/versions/0.8.1) package to create a profile report that is helpful for understanding and debugging the dataset. If you run it, it will output a new profile to the `reports` folder.
-
-## Required software
-
-These scripts were developed and tested in R version 4.0.2 using the following packages and versions:
-
-* sdcMicro 5.5.1
-* arrow 2.0.0
-* DataExplorer 0.8.1 (optional for profiling)
-* Hmisc 4.4-0 (optional for profiling)
-* inspectdf 0.0.8 (optional for profiling)
-* dplyr 1.0.1 (optional for profiling)
+* [county_pop_demo_for_verify.csv](data/raw/county_pop_demo_for_verify.csv) a utility dataset generated from the [2019 census estimates](https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html) that contain populations counts for each county by sex, race, and ethnicity. Based on a shared utility dataset made by HHSProtect, formatted to be easier to use by the verification script
+* [profile_data.R](R/profile_data.R) that uses the [DataExplorer](https://www.rdocumentation.org/packages/DataExplorer/versions/0.8.1) package to create a profile report that is helpful for understanding and debugging the dataset. If you run it, it will output a new profile to the `reports` folder.
+* [parquet2csv.R](R/parquet2csv.R) that uses the [Arrow](https://arrow.apache.org/docs/r/) package to read the dataset in parquet format and output an equivalent CSV file 
 
 ## Structure
 
@@ -115,7 +128,7 @@ These files and folders are meant to help organize and make it easier for others
 │   ├── functions.R                         <- functions that are reused in other scripts
 │   ├── parquet2csv.R                       <- converts a parquet file to csv
 │   ├── profile_data.R                      <- creates a data profile report for exploratory data analysis
-│   ├── renv.R                              <- dependency file (generated by renv::snapshot())
+│   ├── renv.lock                           <- dependency file (generated by renv::snapshot())
 │   ├── review_public.R                     <- script to review public12 data file
 │   └── review_public_countyjan.R           <- script to review public19 data file
 ├── data                                    <- data files used by project
@@ -129,7 +142,9 @@ These files and folders are meant to help organize and make it easier for others
 
 ## References
 
+* Lee, B., Dupervil, B., Deputy, N. P., Duck, W., Soroka, S., Bottichio, L., Silk, B., Price, J., Sweeney, P., Fuld, J., Weber, T., & Pollock, D. (2021). Protecting Privacy and Transforming COVID-19 Case Surveillance Datasets for Public Use. ArXiv:2101.05093. http://arxiv.org/abs/2101.05093
 * <https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data/vbim-akqf>
+* <https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4>
 * Samarati, P., & Sweeney, L. (1998). Protecting privacy when disclosing information: k-anonymity and its enforcement through generalization and suppression. Tech. rep. SRI-CSL-98-04, SRI Computer Science Laboratory, Palo Alto, CA.
 * Benschop, Thijs, and Matthew Welch. Statistical Disclosure Control for Microdata: A Practice Guide for SdcMicro — SDC Practice Guide Documentation. June 2016, <https://sdcpractice.readthedocs.io/en/latest/index.html>.
 * Templ M, Kowarik A, Meindl B (2015). “Statistical Disclosure Control for Micro-Data Using the R Package sdcMicro.” Journal of Statistical Software, 67(4), 1–36. doi: 10.18637/jss.v067.i04
