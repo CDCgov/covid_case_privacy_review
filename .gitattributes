@@ -17,3 +17,6 @@
 
 # if project contains large binary files, include lfs commands following example comment below
 # data/clean/*** filter=lfs diff=lfs merge=lfs -text
+
+# the project was showing as 99% html because of the data profiles, if we ever add real html, remove
+*.html linguist-detectable=false

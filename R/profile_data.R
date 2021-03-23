@@ -2,7 +2,10 @@
 # Exploring DataExplorer, Hmisc.describe, inspectdf
 
 source("functions.R")
-
+# DataExplorer is not available in CRAN, need to download from github
+#library(devtools)
+#install_github("boxuancui/DataExplorer")
+library(rmarkdown)
 library(DataExplorer)
 library(arrow)
 
@@ -10,11 +13,8 @@ report_dir = "../reports"
 data_dir = "../data/raw"
 
 # now there's two datasets, so profile each one...
-
 # change these depending on the data set...
-
-#public_file_name <- "COVID_Cases_Public_Limited_20210228.csv"
-public_file_name <- "COVID_Cases_Public_Limited_08312020.csv"
+public_file_name <- "COVID_Cases_Public_Limited_20210228.csv"
 public_detailed_file_name <- paste(data_dir,"/",public_file_name,sep="")
 public_report_file_name <- sub(".csv","_profile.html",public_file_name)
 public_report_title <- "COVID-19 Case Surveillance Public Use Data Profile (2021-02-28 version)"
@@ -27,7 +27,7 @@ public_geo_report_title <- "COVID-19 Case Surveillance Public Use Data with Geog
 cat("Processing file:", public_detailed_file_name,"\n\n")
 
 # update this depending on the data set
-public_date_fields <- c("pos_spec_dt","onset_dt","cdc_report_dt")
+public_date_fields <- c("pos_spec_dt","onset_dt","cdc_report_dt","cdc_case_earliest_dt")
 date_fields <- public_date_fields
 
 #start the work
@@ -39,6 +39,10 @@ for (field in date_fields){
 }
 
 str(data)
+# MAX - Latest - date:
+head(data %>% distinct(cdc_case_earliest_dt) %>% arrange(desc(cdc_case_earliest_dt)))
+# Min Date:
+head(data %>% distinct(cdc_case_earliest_dt) %>% arrange(cdc_case_earliest_dt))
 
 # output_format = "github_document", output_file = "profile.md" for outputting markdown version
 
@@ -47,7 +51,7 @@ DataExplorer::create_report(data,
                             report_title = public_report_title,
                             output_file = public_report_file_name,
                             output_dir = report_dir,
-                            config = configure_report(plot_bar_args=list(maxcat=100)))
+                            config = configure_report(plot_bar_args=list(maxcat=2000)))
 
 cat("Processing file:", public_geo_detailed_file_name,"\n\n")
 

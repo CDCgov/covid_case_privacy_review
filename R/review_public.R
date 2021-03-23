@@ -24,7 +24,7 @@ quasi_identifiers = c("race_ethnicity_combined","sex","age_group")
 confidential_attributes = c("pos_spec_dt")
 
 #data folder symlinked to data, changed filename to current file
-file_name <- "COVID_Cases_Public_Limited_12042020.csv"
+file_name <- "COVID_Cases_Public_Limited_20210228.csv"
 
 suppressed_file_name = paste(out_dir,"/",file_name,".suppressed.csv",sep="")
 detailed_file_name = paste(data_dir,"/",file_name,sep="")

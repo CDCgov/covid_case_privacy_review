@@ -52,9 +52,9 @@ Checks its 12 variables for...
 
 Checked for k=5
 
-* age_group 
-* sex 
-* race_ethnicity_combined 
+* age_group
+* sex
+* race_ethnicity_combined
 
 ### Confidential attributes (1)
 
@@ -115,9 +115,9 @@ For convenience, a portion of this output is stored in `reports/log.md` to compa
 
 ## Helper files
 
-* [county_pop_demo_for_verify.csv](data/raw/county_pop_demo_for_verify.csv) a utility dataset generated from the [2019 census estimates](https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html) that contain populations counts for each county by sex, race, and ethnicity. Based on a shared utility dataset made by HHSProtect, formatted to be easier to use by the verification script
+* [county_pop_demo_for_verify.csv](data/raw/county_pop_demo_for_verify.csv) a utility dataset generated from the [2019 census estimates](https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html) that contain populations counts for each county by sex, race, and ethnicity. Based on a shared utility dataset made by HHSProtect, formatted to be easier to use by the verification script.
 * [profile_data.R](R/profile_data.R) that uses the [DataExplorer](https://www.rdocumentation.org/packages/DataExplorer/versions/0.8.1) package to create a profile report that is helpful for understanding and debugging the dataset. If you run it, it will output a new profile to the `reports` folder.
-* [parquet2csv.R](R/parquet2csv.R) that uses the [Arrow](https://arrow.apache.org/docs/r/) package to read the dataset in parquet format and output an equivalent CSV file 
+* [parquet2csv.R](R/parquet2csv.R) that uses the [Arrow](https://arrow.apache.org/docs/r/) package to read the dataset in parquet format and output an equivalent CSV file. 
 
 ## Structure
 
@@ -139,6 +139,9 @@ These files and folders are meant to help organize and make it easier for others
 └── reports                                 <- Generated reports and visualizations
     └── log.md                              <- logged results from reviewed files
 ```
+## TODOs
+
+* Investigate using [dlookr](https://cran.r-project.org/web/packages/dlookr/index.html) instead of DataExplorer.
 
 ## References
 
