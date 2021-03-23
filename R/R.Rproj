@@ -3,7 +3,6 @@ Version: 1.0
 RestoreWorkspace: No
 SaveWorkspace: No
 AlwaysSaveHistory: Default
-QuitChildProcessesOnExit: Default
 
 EnableCodeIndexing: Yes
 UseSpacesForTab: Yes
@@ -15,5 +14,4 @@ LaTeX: pdfLaTeX
 
 AutoAppendNewline: Yes
 StripTrailingWhitespace: Yes
-
 LineEndingConversion: Posix

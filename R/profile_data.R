@@ -7,21 +7,24 @@ source("functions.R")
 #install_github("boxuancui/DataExplorer")
 library(rmarkdown)
 library(DataExplorer)
-library(Hmisc)
-library(inspectdf)
-library(dplyr)
+library(arrow)
 
 report_dir = "../reports"
 data_dir = "../data/raw"
 
-# change these depending on the current data set...
-report_file_name <- "COVID_Cases_Public_Limited_20210228_profile.html"
-report_title <- "COVID-19 Case Surveillance Public Use Data Profile (2021-02-28▼ version)"
+# now there's two datasets, so profile each one...
+# change these depending on the data set...
+public_file_name <- "COVID_Cases_Public_Limited_20210228.csv"
+public_detailed_file_name <- paste(data_dir,"/",public_file_name,sep="")
+public_report_file_name <- sub(".csv","_profile.html",public_file_name)
+public_report_title <- "COVID-19 Case Surveillance Public Use Data Profile (2021-02-28 version)"
 
-file_name <- "COVID_Cases_Public_Limited_20210228.csv"
-detailed_file_name <- paste(data_dir,"/",file_name,sep="")
+public_geo_file_name <- "public_county_geography_2020-03-22.parquet"
+public_geo_detailed_file_name <- paste(data_dir,"/",public_geo_file_name,sep="")
+public_geo_report_file_name <- sub(".parquet","_profile.html",public_geo_file_name)
+public_geo_report_title <- "COVID-19 Case Surveillance Public Use Data with Geography Profile (2021-03-23 version)"
 
-cat("Processing file:", detailed_file_name,"\n\n")
+cat("Processing file:", public_detailed_file_name,"\n\n")
 
 # update this depending on the data set
 public_date_fields <- c("pos_spec_dt","onset_dt","cdc_report_dt","cdc_case_earliest_dt")
@@ -29,7 +32,7 @@ date_fields <- public_date_fields
 
 #start the work
 
-data <- read.csv(detailed_file_name, fileEncoding="UTF-8-BOM", na.strings=c('NA','','Missing'))
+data <- read.csv(public_detailed_file_name, fileEncoding="UTF-8-BOM", na.strings=c('NA','','Missing'))
 
 for (field in date_fields){
   data[[field]] <- as.Date(data[[field]],format="%Y-%m-%d")
@@ -45,19 +48,19 @@ head(data %>% distinct(cdc_case_earliest_dt) %>% arrange(cdc_case_earliest_dt))
 
 # this takes A LOT of memory. maxcat=2000 only runs on my 24GB ram vm, maxcat=100 runs on my 16GB laptop
 DataExplorer::create_report(data,
-                            report_title = report_title,
-                            output_file = report_file_name,
+                            report_title = public_report_title,
+                            output_file = public_report_file_name,
                             output_dir = report_dir,
                             config = configure_report(plot_bar_args=list(maxcat=2000)))
 
-#describe(data)
+cat("Processing file:", public_geo_detailed_file_name,"\n\n")
 
-#inspect_cat(data) %>% show_plot()
+data_geo <- read_parquet(public_geo_detailed_file_name, as_data_frame = TRUE)
 
-#inspect_na(data) %>% show_plot()
+str(data_geo)
 
-#inspect_num(data) %>% show_plot()
-
-#inspect_types(data) %>% show_plot()
-
-#inspect_imb(data) %>% show_plot()
+DataExplorer::create_report(data_geo,
+                            report_title = public_geo_report_title,
+                            output_file = public_geo_report_file_name,
+                            output_dir = report_dir,
+                            config = configure_report(plot_bar_args=list(maxcat=100),plot_correlation_args = list(maxcat=100), plot_prcomp_args = list(maxcat=100)))
