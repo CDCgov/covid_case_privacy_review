@@ -145,7 +145,7 @@ num_v = nrow(violations)
 cat("Low population county violations (",num_v,"). If greater than zero violations, then the list of counties with violations and 5 sample violations.\n")
 if (num_v > 0){
   print(unique(violations$res_county))
-  print(violations[sample(num_v,5),c(quasi_identifiers, 'sum_of_tot_pop')])
+  print(violations[sample(num_v,min(num_v,5)),c(quasi_identifiers, 'sum_of_tot_pop')])
 }
 
 #basically my logic here for rule #4 is that any county's population by sex, race, and/or ethnicity should be greater than or equal to 220. So I'll check each record that's not NA
@@ -158,7 +158,7 @@ violations <- subset(data_with_census, res_county != 'NA' & census_subpopulation
 num_v = nrow(violations)
 cat("Subpopulation county violations, part 1 checking subpopulation for counties (",num_v,"). If greater than zero violations, then here's 5 sample violations.\n")
 if (num_v > 0){
-  print(violations[sample(num_v,5),])
+  print(violations[sample(num_v,min(num_v,5)),])
 }
 
 #then also want to check for situations where I couldn't get the subpopulation, for records that don't have a subpop, either the county should be NA, or all the demo fields should be NA
@@ -174,7 +174,7 @@ violations = subset(potential_violations,
 num_v = nrow(violations)
 cat("Subpopulation county violations, part 2, checking to make sure there aren't any res_county that aren't NA but have subpops (",num_v,"). If greater than zero violations, then here's 5 sample violations.\n")
 if (num_v > 0){
-  print(violations[sample(num_v,5),])
+  print(violations[sample(num_v,min(num_v,5)),])
 }
 
 cat('\n\nProcessing check for case counts by subpopulation (rule #5), should be 0.\n')
@@ -194,7 +194,7 @@ violations = subset(data_with_census_case, county_fips_code != 'NA' & (cases_sub
 num_v = nrow(violations)
 cat("Subpopulation population too small for cases (",num_v,"). If greater than zero violations, then here's 5 sample violations.\n")
 if (num_v > 0){
-  print(violations[sample(num_v,5),])
+  print(violations[sample(num_v,min(num_v,5)),])
 }
 
 cat('\n\nProcessing check for county/state complementary offsets (rule #10), should be 0.\n')
