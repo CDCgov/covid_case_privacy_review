@@ -51,7 +51,7 @@ summarize_violations <- function(data, sdc, k, qis){
   num_v = nrow(violations)
   cat("k-anon violations (",num_v,") for k=(",k,") and quasi-identifiers (",qis,"). If greater than zero violations, then here's 5 violations.\n")
   if (num_v > 0){
-    print(violations[sample(nrow(violations),5),])
+    print(violations[sample(num_v,min(num_v,5)),])
   }
   cat("\n\n")
   fk
@@ -205,7 +205,7 @@ summarize_linked_attribute_violations <- function(data, linked_attributes){
       num_v = nrow(link_violations)
       cat("linked variable violations (",num_v,") for source_field=(",source_field,") and linked_field=(",linked_field,"). If greater than zero violations, then here's 5 violations.\n")
       if (num_v > 0){
-        print(link_violations[,c(source_field,linked_field)][sample(nrow(link_violations),5),])
+        print(link_violations[,c(source_field,linked_field)][sample(num_v,min(num_v,5)),])
       }
       cat("\n\n")
     }
