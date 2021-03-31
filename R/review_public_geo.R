@@ -127,7 +127,13 @@ report(sdcObj, outdir = report_dir, filename = file_name,
 
 cat('Processing check for low population counties (rule #3), should be 0.\n')
 
-county_data = read.csv(COUNTY_POP_FILE_NAME, fileEncoding="UTF-8-BOM", na.strings=c('NA',''),colClasses=c("state_county_combined_fips"="character"))
+#weird way to read in a file to support utf characters in dataset #TODO fix
+fileIn=file(COUNTY_POP_FILE_NAME,open="rb",encoding="UTF-8-BOM")
+lines = readLines(fileIn)
+county_data = read.csv(text=lines, na.strings=c('NA',''))
+colnames(county_data)[1] <- "state_county_combined_fips"
+
+#county_data = read.csv(COUNTY_POP_FILE_NAME, fileEncoding="UTF-8-BOM", na.strings=c('NA',''),colClasses=c("state_county_combined_fips"="character"))
 names(county_data)[names(county_data) == 'state_county_combined_fips'] <- 'county_fips_code'
 names(county_data) <- tolower(names(county_data))
 county_data['state_abbr'] = state.abb[match(county_data$stname,state.name)]
