@@ -30,11 +30,11 @@ library(arrow)
 library(flextable)
 data_dir = "../data/raw"
 
-file_name <- "public_county_geography_2020-03-22.parquet"
+file_name <- "public_county_geography_2021-03-31.parquet"
 detailed_file_name = paste(data_dir,"/",file_name,sep="")
 
 #change me to whatever version you want to display
-dataset_version <- "2021-03-22"
+dataset_version <- "2021-03-31"
 
 location_quasi_identifiers = c("res_state","res_county")
 quasi_identifiers = c("case_month", location_quasi_identifiers, "age_group","sex","race","ethnicity","death_yn")
@@ -51,9 +51,9 @@ set_flextable_defaults(
 )
 ```
 
-# COVID-19 Case Surveillance Public Use Data with Geography Utility Summary
+# [COVID-19 Case Surveillance Public Use Data with Geography](https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4) Utility Summary
 
-Users should consider the level of completeness, including suppression levels when planning their analyses and use of public datasets. Privacy protections will suppress field values to reduce reidentification risks. Completeness varies by jurisdiction (i.e., state, local, and territorial) and time period. Variables are consistently coded to the value “Unknown” when jurisdictions specify in the case data submitted to CDC that the value is unknown, the value “Missing” when jurisdictions do not provide a value, and the value “NA” when the value is suppressed as part of privacy protections.  
+Users should consider the level of completeness, including suppression levels when planning their analyses and use of public datasets. Privacy protections will suppress field values to reduce reidentification risks. Completeness varies by jurisdiction (i.e., state, local, and territorial) and time period. Variables are consistently coded to the value "Unknown" when jurisdictions specify in the case data submitted to CDC that the value is unknown, the value "Missing" when jurisdictions do not provide a value, and the value "NA" when the value is suppressed as part of privacy protections.  
 
 Dataset version: `r dataset_version`
 
