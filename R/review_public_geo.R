@@ -50,7 +50,7 @@ linked_attributes = list(
   )
 
 #if I use a CSV then there's logic to change down below
-file_name <- "public_county_geography_2020-03-22.parquet"
+file_name <- "public_county_geography_2021-03-31.parquet"
 suppressed_file_name = paste(out_dir,"/",file_name,".suppressed.csv",sep="")
 detailed_file_name = paste(data_dir,"/",file_name,sep="")
 print(detailed_file_name)
@@ -137,6 +137,13 @@ colnames(county_data)[1] <- "state_county_combined_fips"
 names(county_data)[names(county_data) == 'state_county_combined_fips'] <- 'county_fips_code'
 names(county_data) <- tolower(names(county_data))
 county_data['state_abbr'] = state.abb[match(county_data$stname,state.name)]
+
+if(.Platform$OS.type == "windows") withAutoprint(
+  + memory.size()
+  + memory.size(TRUE)
+  + memory.limit())
+
+memory.limit(size=175000)
 
 data_with_census = merge(x=data, y=county_data, by = 'county_fips_code', all.x = TRUE)
 
