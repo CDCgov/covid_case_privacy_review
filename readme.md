@@ -8,23 +8,28 @@ If you have any of the above, please [submit an issue on github](https://github.
 
 ## Requires
 
+Detailed dependencies are in [renv.lock](./R/renv.lock), but main dependencies called out
+
 * R version >= 4.0.3 (although I suspect, but have not tested >=3.5)
 * [sdcMicro](https://cran.r-project.org/web/packages/sdcMicro/index.html) version >= 5.5.1
 * [arrow](https://cran.r-project.org/web/packages/arrow/index.html) version >= 2.0.0
 * [renv](https://cran.r-project.org/web/packages/renv/index.html) >= 0.12.3
 * optional for profiling
   * [DataExplorer](https://cran.r-project.org/web/packages/DataExplorer/index.html) >=0.8.2
+* optional for rmarkdown
+  * Some LaTeX installed (I used [MacTeX](http://www.tug.org/mactex/), but [TinyTex](https://yihui.name/tinytex/) should do)
+  * [flextable](https://cran.r-project.org/web/packages/flextable/index.html) >=0.6.4
 
 ## Install & run procedures
 
 `renv::restore()` to install necessary packages
 
-Then in or symlik a data file to the `data/raw` folder, update the script with the name of the data file, run from the `R` folder of this project. This script will generate output to the console and create a privacy report in the `reports` folder.
+Then in or symlink a data file to the `data/raw` folder, update the script with the name of the data file, run from the `R` folder of this project. This script will generate output to the console and create a privacy report in the `reports` folder.
 
 * [R/review_public.R](R/review_public.R) - to review the public12 file
 * [R/review_public_geo.R](R/review_public_geo.R) - to review the public19 file
 
-`renv:snapshot()` to update renv.lock with any changes made to dependencies
+`renv::snapshot()` to update renv.lock with any changes made to dependencies
 
 ## Description
 
@@ -84,12 +89,12 @@ Checked for k=11
 
 ### Population level and geography specific checks
 
-* Checking county population and res_county should never be populated if the county population (by fips code) is under 20k.
+* Checking county population and res_county should never be populated if the county population (by FIPS code) is under 20k.
 * Checking that sex, race, ethnicity demographic values should never be populated with the county subpopulation by those demographics is under 220 (k*20).
 * Checking for case county by sex, race, ethnicity in a county is never higher than 50% of the subpopulation by those demographics for the county.
 * Checking that there is never a situation where only a single county within a state is suppressed, allowing the state to be deduced by process of elimination.
 * Checks that if res_state is suppressed, then res_county should also be suppressed.
-* FIPS code fields are associated with quasi-identifiers so they are checked to make sure that they are always suppressed when corressponding fields are suppressed.
+* FIPS code fields are associated with quasi-identifiers so they are checked to make sure that they are always suppressed when corresponding fields are suppressed.
   * state_fips_code, suppressed when res_state is suppressed
   * county_fips_code, suppressed when res_state is suppressed
 
@@ -113,6 +118,11 @@ For the geography checks, there are multiple steps, so output should be reviewed
 
 For convenience, a portion of this output is stored in `reports/log.md` to compare results on previous versions of the dataset.
 
+## Analysis and Visualization files
+
+* [utility_summary_public.Rmd](./analysis/utility_summary_public.Rmd) - RMarkdown analysis to generate [PDF report showing utility summary](./analysis/utility_summary_public_geo.pdf) for public dataset
+* [utility_summary_public_geo.Rmd](./analysis/utility_summary_public_geo.Rmd) - RMarkdown analysis to generate [PDF report showing utility summary](./analysis/utility_summary_public_geo.pdf) for public dataset
+
 ## Helper files
 
 * [county_pop_demo_for_verify.csv](data/raw/county_pop_demo_for_verify.csv) a utility dataset generated from the [2019 census estimates](https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html) that contain populations counts for each county by sex, race, and ethnicity. Based on a shared utility dataset made by HHSProtect, formatted to be easier to use by the verification script.
@@ -124,6 +134,11 @@ For convenience, a portion of this output is stored in `reports/log.md` to compa
 These files and folders are meant to help organize and make it easier for others to understand and contribute.
 
 ```sh
+├── analysis                                <- analysis and visualization files
+│   ├── utility_summary_public.Rmd          <- utility summary analysis for public dataset
+│   ├── utility_summary_public.pdf          <- generated report from utility summary analysis
+│   └── utility_summary_public_geo.Rmd      <- utility summary analysis for public geo dataset
+│   └── utility_summary_public_geo.pdf      <- generated report from utility summary analysis
 ├── R                                       <- R scripts
 │   ├── functions.R                         <- functions that are reused in other scripts
 │   ├── parquet2csv.R                       <- converts a parquet file to csv

@@ -1,0 +1,93 @@
+---
+latex_engine: xelatex
+geometry: top = 1cm, bottom=1cm, left=2cm, right=2cm
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+  word_document: default
+  tables:
+    style: Table
+    layout: autofit
+    width: 1.0
+    caption:
+      style: Table Caption
+      pre: 'Table '
+      sep: ': '
+    conditional:
+      first_row: true
+      first_column: false
+      last_row: false
+      last_column: false
+      no_hband: false
+      no_vband: true
+---
+\pagenumbering{gobble}
+```{r setup, include=FALSE}
+source("../R/functions.R")
+
+library(arrow)
+library(flextable)
+data_dir = "../data/raw"
+
+file_name <- "COVID_Cases_Public_Limited_20210331.parquet"
+detailed_file_name = paste(data_dir,"/",file_name,sep="")
+
+#change me to whatever version you want to display
+dataset_version <- "2021-03-31"
+
+quasi_identifiers = c("race_ethnicity_combined","sex","age_group")
+
+data <- read_parquet(detailed_file_name, as_data_frame = TRUE)
+
+quick <- quick_summary(data, label="all_fields", qis=quasi_identifiers, print=FALSE)
+
+utility <- summarize_utility(data, quasi_identifiers, print=FALSE)
+
+knitr::opts_chunk$set(echo = FALSE)
+set_flextable_defaults(
+  fonts_ignore=TRUE
+)
+```
+
+# [COVID-19 Case Surveillance Public Use Data](https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data/vbim-akqf) Utility Summary
+
+Users should consider the level of completeness, including suppression levels when planning their analyses and use of public datasets. Privacy protections will suppress field values to reduce reidentification risks. Completeness varies by jurisdiction (i.e., state, local, and territorial) and time period. Variables are consistently coded to the value "Unknown" when jurisdictions specify in the case data submitted to CDC that the value is unknown, the value "Missing" when jurisdictions do not provide a value, and the value "NA" when the value is suppressed as part of privacy protections.  
+
+Dataset version: `r dataset_version`
+
+Total records in dataset: `r commas(nrow(data))`
+
+## Quick Summary
+```{r ft.align="left"}
+quick_df <- data.frame(cbind(" "=row.names(quick),quick))
+colnames(quick_df) <- c(" ",colnames(quick))
+ft1 <- theme_zebra(flextable(quick_df), odd_header="transparent", odd_body="#dce4f4",even_body="transparent")
+ft1 <- align(ft1, j=c("all_fields","quasi_fields"), align="right")
+ft1 <- line_spacing(ft1, space=1, part="all")
+ft1 <- fontsize(ft1, size=8, part="all")
+ft1 <- padding(ft1, padding.top=0, part="all")
+ft1 <- hrule(ft1, rule="atleast", part="all")
+ft1 <- height_all(ft1, 2, part="all")
+ft1 <- hline(ft1, part="all")
+ft1 <- vline(ft1, part="all")
+ft1 <- border_outer(ft1, part="all")
+ft1 <- autofit(ft1, add_h=100)
+ft1
+```
+
+## Field-level Utility Summary
+```{r ft.align="left"}
+ft2 <- theme_zebra(flextable(cbind(" "=row.names(utility),utility)), odd_header="transparent", odd_body="#dce4f4",even_body="transparent")
+ft2 <- autofit(ft2)
+ft2 <- align(ft2, j=c("suppressed","suppressed_percent","missing","missing_percent"), align="right")
+#ft2 <- height(ft2, height=1)
+#ft2 <- hrule(ft2, rule="auto")
+ft2 <- line_spacing(ft2, space=1, part="all")
+ft2 <- fontsize(ft2, size=8, part="all")
+ft2 <- hline(ft2, part="all")
+ft2 <- vline(ft2, part="all")
+ft2 <- border_outer(ft2, part="all")
+ft2
+```
+

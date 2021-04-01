@@ -12,7 +12,7 @@
 # Rendered reports
 analysis/*.html
 analysis/*.docx
-analysis/*.pdf
+analysis/*.tex
 reports/*.docx
 reports/*.pdf
 
