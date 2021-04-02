@@ -424,8 +424,6 @@ Expected number of re-identifications: 22173.94 (0.10 %)
 k-anon violations ( 0 ) for k=( 11 ) and quasi-identifiers ( case_month res_state res_county age_group sex race ethnicity death_yn ). If greater than zero violations, then here's 5 violations.
 
 
-
-
 Writing out a privacy eval report to: ../reports/public_county_geography_2020-03-22.parquet.html 
 
 Processing check for low population counties (rule #3), should be 0.
@@ -450,22 +448,32 @@ County/state complementary violations ( 0 ). If greater than zero violations, th
 
 ```
 
-[1] "../data/raw/COVID_Cases_Public_Limited_20210331.csv"
+[1] "../covid_case_privacy_review/data/raw/COVID_Cases_Public_Limited_20210331.parquet"
 
-[1] "Existing suppression summary:"
+[1] "Quick summary:"
+                  all_fields  quasi_fields
+total_fields      12          3           
+total_records     22,507,139  22,507,139  
+total_cells       270,085,668 67,521,417  
+missing_fields    55,232,635  1,061,158   
+missing_pct       20%         2%          
+complete_fields   214,853,033 66,460,259  
+complete_pct      80%         98%         
+unknown_fields    19,622,928  8,802,727   
+unknown_pct       7%          13%         
+suppressed_fields 105         105         
+suppressed_pct    0%          0%          
+available_fields  195,230,000 57,657,427  
+available_pct     72%         85%         
+
+Utility summary:
 Total records in dataset: 22,507,139 
-                                  na_count na_percent
-race_ethnicity_combined                  0       0.0%
-sex                                      0       0.0%
-age_group                                0       0.0%
-records_with_any_field_suppressed       NA        NA%
+                        suppressed suppressed_percent   missing missing_percent
+race_ethnicity_combined         10               0.0%   840,025            3.7%
+sex                             22               0.0%    52,476            0.2%
+age_group                       73               0.0%   168,657            0.7%
+records_with_any_field          73               0.0% 1,001,748            4.5%
 
-
-                                  na_count na_percent
-race_ethnicity_combined                  0       0.0%
-sex                                      0       0.0%
-age_group                                0       0.0%
-records_with_any_field_suppressed       NA        NA%
 
 SDC summary for k-anon-level( 5 ).
 The input dataset consists of 22507139 rows and 12 variables.
@@ -480,14 +488,10 @@ In parenthesis, the same statistics are shown for the unmodified data.
 Note: NA (missings) are counted as seperate categories!
 
 
-            Key Variable Number of categories        Mean size               Size of smallest (>0)
- race_ethnicity_combined                   10 (10) 2250713.900 (2250713.900)                    10
-                     sex                    6  (6) 3751189.833 (3751189.833)                    22
-               age_group                   11 (11) 2046103.545 (2046103.545)                    73
-     
- (10)
- (22)
- (73)
+            Key Variable Number of categories        Mean size               Size of smallest (>0)     
+ race_ethnicity_combined                   10 (10) 2250713.900 (2250713.900)                    10 (10)
+                     sex                    6  (6) 3751189.833 (3751189.833)                    22 (22)
+               age_group                   11 (11) 2046103.545 (2046103.545)                    73 (73)
 ----------------------------------------------------------------------
 
 
@@ -498,15 +502,16 @@ Expected number of re-identifications: 379.00 (0.00 %)
 
 k-anon violations ( 0 ) for k=( 5 ) and quasi-identifiers ( race_ethnicity_combined sex age_group ). If greater than zero violations, then here's 5 violations.
 
-Writing out a privacy eval report to: ../reports/COVID_Cases_Public_Limited_20210331.csv.html 
+Writing out a privacy eval report to: ../covid_case_privacy_review/reports/COVID_Cases_Public_Limited_20210331.parquet.html 
 
-Processing l-diversity ( 2 ) checks for < ../data/raw/COVID_Cases_Public_Limited_20210331.csv > that has < 22507139 > records; < 12 > variables; < 3 > quasi-identifiers ( race_ethnicity_combined sex age_group ); and < 1 > confidential attributes ( pos_spec_dt ).
+Processing l-diversity ( 2 ) checks for < ../covid_case_privacy_review/data/raw/COVID_Cases_Public_Limited_20210331.parquet > that has < 22507139 > records; < 12 > variables; < 3 > quasi-identifiers ( race_ethnicity_combined sex age_group ); and < 1 > confidential attributes ( pos_spec_dt ).
 
 checking l-diversity manually for < pos_spec_dt >, found < 0 > l-diversity violations.
 [1] race_ethnicity_combined sex                     age_group               pos_spec_dt            
 [5] fk                      ldiv                   
 <0 rows> (or 0-length row.names)
 ```
+
 ## 2021-03-31 Public Geo
 
 [DataExplorer Profile](../reports/public_county_geography_2021-03-31_profile.html)
