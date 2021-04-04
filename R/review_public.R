@@ -5,15 +5,16 @@
 #sdcApp(maxRequestSize = 2000)
 #View(data)
 
-source("functions.R")
+source("../covid_case_privacy_review/R/functions.R")
 
+library(arrow)
 library(sdcMicro)
 
 getwd()
 
-report_dir = "../reports"
-out_dir = "../output"
-data_dir = "../data/raw"
+report_dir = "../covid_case_privacy_review/reports"
+out_dir = "../covid_case_privacy_review/output"
+data_dir = "../covid_case_privacy_review/data/raw"
 
 KANON_LEVEL <- 5
 KANON_LEVEL
@@ -23,17 +24,30 @@ LDIV_LEVEL
 quasi_identifiers = c("race_ethnicity_combined","sex","age_group")
 confidential_attributes = c("pos_spec_dt")
 
-#data folder symlinked to data, changed filename to current file
-file_name <- "COVID_Cases_Public_Limited_20210331.csv"
+#if I use a CSV then there's logic to change down below
+file_name <- "COVID_Cases_Public_Limited_20210331.parquet"
+#file_name <- "github_test.csv"
 
 suppressed_file_name = paste(out_dir,"/",file_name,".suppressed.csv",sep="")
 detailed_file_name = paste(data_dir,"/",file_name,sep="")
 print(detailed_file_name)
 
-data = read.csv(detailed_file_name, fileEncoding="UTF-8-BOM")
+#data = read.csv(detailed_file_name, fileEncoding="UTF-8-BOM")
+df = read_parquet(detailed_file_name, as_data_frame = TRUE)
+#for some reason the dataframe from arrow makes sdc take forever and error, but if I make a new dataframe it works, todo figure it out
+data <- data.frame(df)
 
 #summarize existing suppressions
-summarize_suppression(data, quasi_identifiers)
+#summarize_suppression(data, quasi_identifiers)
+#summarize dataset
+result <- quick_summary(data, label="all_fields", qis=quasi_identifiers)
+
+#summarize existing utility
+summary <- summarize_utility(data, quasi_identifiers)
+
+#any linked variables not suppressed when they are supposed to be? (rules #7,8,9)
+summarize_linked_attribute_violations(data, linked_attributes)
+
 
 #to check for ldiversity, let's recode blank confidential attributes to NA
 for (ca in confidential_attributes){
