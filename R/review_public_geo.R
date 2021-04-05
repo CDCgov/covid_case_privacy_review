@@ -25,9 +25,13 @@ library(sdcMicro)
 
 getwd()
 
-report_dir = "../reports"
-out_dir = "../output"
-data_dir = "../data/raw"
+# report_dir = "../reports"
+# out_dir = "../output"
+# data_dir = "../data/raw"
+
+report_dir = "../covid_case_privacy_review/reports"
+out_dir = "../covid_case_privacy_review/output"
+data_dir = "../covid_case_privacy_review/data/raw"
 
 KANON_LEVEL_LOCATION <- 1000
 KANON_LEVEL_LOCATION
