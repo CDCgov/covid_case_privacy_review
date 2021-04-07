@@ -4,7 +4,7 @@
 # privacy rules to reduce risk of reidentification
 #sdcApp(maxRequestSize = 2000)
 #View(data)
-
+cat(toString(Sys.time()))
 source("../covid_case_privacy_review/R/functions.R")
 
 library(arrow)
@@ -100,3 +100,5 @@ for (ca in confidential_attributes){
   }
   print(ldiv_violations[c(quasi_identifiers,ca,'fk','ldiv')])
 }
+
+cat(toString(Sys.time()))
