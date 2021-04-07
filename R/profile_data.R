@@ -1,7 +1,8 @@
 # I want to generate some basic exploratory profiles of the data sets to help with describing the various privacy protection scenarios.
 # Exploring DataExplorer, Hmisc.describe, inspectdf
 
-source("functions.R")
+#source("functions.R")
+source("../covid_case_privacy_review/R/functions.R")
 # DataExplorer is not available in CRAN, need to download from github
 #library(devtools)
 #install_github("boxuancui/DataExplorer")

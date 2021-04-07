@@ -18,7 +18,8 @@
 
 cat(toString(Sys.time()))
 
-source("functions.R")
+#source("functions.R")
+source("../covid_case_privacy_review/R/functions.R")
 
 library(arrow)
 library(sdcMicro)
