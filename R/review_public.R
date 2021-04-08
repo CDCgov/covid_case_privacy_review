@@ -26,6 +26,7 @@ confidential_attributes = c("pos_spec_dt")
 
 #if I use a CSV then there's logic to change down below
 file_name <- "COVID_Cases_Public_Limited_20210331.parquet"
+#file_name <- "COVID_Cases_Public_Limited_20210430.parquet"
 #file_name <- "github_test.csv"
 
 suppressed_file_name = paste(out_dir,"/",file_name,".suppressed.csv",sep="")
