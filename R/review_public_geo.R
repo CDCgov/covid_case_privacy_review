@@ -143,13 +143,6 @@ names(county_data)[names(county_data) == 'state_county_combined_fips'] <- 'count
 names(county_data) <- tolower(names(county_data))
 county_data['state_abbr'] = state.abb[match(county_data$stname,state.name)]
 
-if(.Platform$OS.type == "windows") withAutoprint(
-  + memory.size()
-  + memory.size(TRUE)
-  + memory.limit())
-
-memory.limit(size=175000)
-
 data_with_census = merge(x=data, y=county_data, by = 'county_fips_code', all.x = TRUE)
 
 #if I screw up the merge, that's bad
