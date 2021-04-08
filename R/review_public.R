@@ -1,7 +1,7 @@
 # perform a privacy impact review on the covid case surveillance public data file
 # k-anonymity 5 for all quasi-identifiers and l-diversity 2 for all confidential attributes
 # actual supression logic is in DCIPHER contour workflow, this script confirms that files are meeting
-# privacy rules to reduce risk of reidentification
+# privacy rules to reduce risk of re-identification
 #sdcApp(maxRequestSize = 2000)
 #View(data)
 cat(toString(Sys.time()))

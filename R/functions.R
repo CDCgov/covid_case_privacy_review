@@ -600,7 +600,7 @@ what_subpopulation_value <- function(row){
   census_subpopulation
 }
 
-# Copies and recodes columns in a dataframe to NA
+# Copies and recode columns in a dataframe to NA
 # returns a dataframe with all the specified columns recoded to NA
 recode_to_na <- function(data, columns_to_recode, values_to_recode=BLANK_CATEGORIES){
   data_na <- data.frame(data)
@@ -615,3 +615,4 @@ recode_to_na <- function(data, columns_to_recode, values_to_recode=BLANK_CATEGOR
 #apply(data[quasi_identifiers],2,unique)
 #data_foo <- recode_to_na(data,quasi_identifiers,BLANK_CATEGORIES)
 #apply(data_foo[quasi_identifiers],2,unique)
+
