@@ -1,29 +1,33 @@
 # I want to generate some basic exploratory profiles of the data sets to help with describing the various privacy protection scenarios.
 # Exploring DataExplorer, Hmisc.describe, inspectdf
 
-#source("functions.R")
-source("../covid_case_privacy_review/R/functions.R")
+cat(toString(Sys.time()))
+source("functions.R")
+#source("../covid_case_privacy_review/R/functions.R")
 # DataExplorer is not available in CRAN, need to download from github
 #library(devtools)
 #install_github("boxuancui/DataExplorer")
 library(rmarkdown)
 library(DataExplorer)
 library(arrow)
+library(dplyr)
 
 report_dir = "../reports"
 data_dir = "../data/raw"
 
 # now there's two datasets, so profile each one...
 # change these depending on the data set...
-public_file_name <- "COVID_Cases_Public_Limited_20210331.csv"
+#public_file_name <- "COVID_Cases_Public_Limited_20210430.csv"
+public_file_name <- "COVID_Cases_Public_Limited_20210430.parquet"
 public_detailed_file_name <- paste(data_dir,"/",public_file_name,sep="")
-public_report_file_name <- sub(".csv","_profile.html",public_file_name)
-public_report_title <- "COVID-19 Case Surveillance Public Use Data Profile (2021-03-31 version)"
+#public_report_file_name <- sub(".csv","csv_profile.html",public_file_name)
+public_report_file_name <- sub(".parquet","_parquet_profile.html",public_file_name)
+public_report_title <- "COVID-19 Case Surveillance Public Use Data Profile (2021-04-30 version)"
 
-public_geo_file_name <- "public_county_geography_2021-03-31.parquet"
+public_geo_file_name <- "public_county_geography_2021-04-30.parquet"
 public_geo_detailed_file_name <- paste(data_dir,"/",public_geo_file_name,sep="")
 public_geo_report_file_name <- sub(".parquet","_profile.html",public_geo_file_name)
-public_geo_report_title <- "COVID-19 Case Surveillance Public Use Data with Geography Profile (2021-03-31 version)"
+public_geo_report_title <- "COVID-19 Case Surveillance Public Use Data with Geography Profile (2021-04-30 version)"
 
 cat("Processing file:", public_detailed_file_name,"\n\n")
 
@@ -33,7 +37,8 @@ date_fields <- public_date_fields
 
 #start the work
 
-data <- read.csv(public_detailed_file_name, fileEncoding="UTF-8-BOM", na.strings=c('NA','','Missing'))
+#data <- read.csv(public_detailed_file_name, fileEncoding="UTF-8-BOM", na.strings=c('NA','','Missing'))
+data <- read_parquet(public_detailed_file_name, as_data_frame = TRUE)
 
 for (field in date_fields){
   data[[field]] <- as.Date(data[[field]],format="%Y-%m-%d")

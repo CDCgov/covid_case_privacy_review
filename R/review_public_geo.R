@@ -18,21 +18,16 @@
 
 cat(toString(Sys.time()))
 
-#source("functions.R")
-source("../covid_case_privacy_review/R/functions.R")
-
+source("functions.R")
 library(arrow)
 library(sdcMicro)
 
 getwd()
 
-# report_dir = "../reports"
-# out_dir = "../output"
-# data_dir = "../data/raw"
+report_dir = "../reports"
+out_dir = "../output"
+data_dir = "../data/raw"
 
-report_dir = "../covid_case_privacy_review/reports"
-out_dir = "../covid_case_privacy_review/output"
-data_dir = "../covid_case_privacy_review/data/raw"
 
 KANON_LEVEL_LOCATION <- 1000
 KANON_LEVEL_LOCATION
@@ -55,7 +50,7 @@ linked_attributes = list(
   )
 
 #if I use a CSV then there's logic to change down below
-file_name <- "public_county_geography_2021-03-31.parquet"
+file_name <- "public_county_geography_2021-04-30.parquet"
 suppressed_file_name = paste(out_dir,"/",file_name,".suppressed.csv",sep="")
 detailed_file_name = paste(data_dir,"/",file_name,sep="")
 print(detailed_file_name)
