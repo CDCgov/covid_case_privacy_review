@@ -30,11 +30,11 @@ library(arrow)
 library(flextable)
 data_dir = "../data/raw"
 
-file_name <- "public_county_geography_2021-03-31.parquet"
+file_name <- "public_county_geography_2021-04-30.parquet"
 detailed_file_name = paste(data_dir,"/",file_name,sep="")
 
 #change me to whatever version you want to display
-dataset_version <- "2021-03-31"
+dataset_version <- "2021-04-30"
 
 location_quasi_identifiers = c("res_state","res_county")
 quasi_identifiers = c("case_month", location_quasi_identifiers, "age_group","sex","race","ethnicity","death_yn")
@@ -73,7 +73,8 @@ ft1 <- height_all(ft1, 2, part="all")
 ft1 <- hline(ft1, part="all")
 ft1 <- vline(ft1, part="all")
 ft1 <- border_outer(ft1, part="all")
-ft1 <- autofit(ft1, add_h=100)
+#ft1 <- autofit(ft1, add_h=100)
+ft1 <- autofit(ft1)
 ft1
 ```
 
