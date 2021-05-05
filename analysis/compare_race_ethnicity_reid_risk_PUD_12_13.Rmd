@@ -1,0 +1,369 @@
+---
+title: "PUD(13 vs 12): Race Ethnicity combined vs separate"
+output: html_notebook
+---
+
+```{r}
+
+source("../R/functions.R")
+library(arrow)
+library(sdcMicro)
+library(dplyr)
+library(gmodels)
+library(R3port)
+
+library(tidyverse)
+library(table1)
+
+report_dir = "../report"
+out_dir = "../out"
+data_dir = "../data/raw"
+
+
+################## Older PUD dataset where Race & Ethnicity are COMBINED ######################
+file_name <- "COVID_Cases_Public_Limited_20210422_12_vars.parquet"
+
+suppressed_file_name = paste(out_dir,"/",file_name,".suppressed.csv",sep="")
+public_file_name = paste(data_dir,"/",file_name,sep="")
+print(public_file_name)
+
+df = read_parquet(public_file_name, as_data_frame = TRUE)
+data_recomb <- data.frame(df)
+data_recomb_na <- subset(data_recomb, race_ethnicity_combined == "NA")
+
+################## NEWER PUD dataset where Race & Ethnicity are Separate ######################
+file_name_2 <- "COVID_Cases_Public_Limited_20210422_13_vars.parquet"
+public_file_name_2 = paste(data_dir,"/",file_name_2,sep="")
+print(public_file_name_2)
+
+df2 = read_parquet(public_file_name_2, as_data_frame = TRUE)
+data_resep <- data.frame(df2)
+data_resep$index <- rownames(data_resep) #adding this so we can relink our subsetting work and run it through sdcmicro
+data_resep_na <- subset(data_resep, race == "NA" | ethnicity == "NA")
+##################################################################################################
+
+resep_na_recomb <- inner_join(data_resep_na, data_recomb)
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question
+
+Is it possible for an intruder to circumvent privacy protections and determine the true value of a __race__ or __ethnicity__ field that has been suppressed by linking to an older version where __race_ethnicity_combined__ was not suppressed? If so, what percent of suppressions canbe circumvented?
+
+How many records have at risk __race__ fields?
+
+How many records have at risk __ethnicity__ fields?
+
+### Example of risk
+
+If NEW.race == NA and OLD.race_combined_ethnicity="White, Non-Hispanic" then an intruder knows the value of race and thus break the 5-anonymity rule for the dataset.
+
+## Assumptions
+
+* Case Line Level team regenerated both the OLD and NEW versions of the ridura dataset and each data file has 23,940,221 observations.
+* OLD has 12 columns using race_ethnicity_combined
+* NEW has 13 columns using race, and ethnicity as separate fields
+
+## Dataset descriptions
+
+### Summary of OLD version
+
+```{r ft.align="left"}
+quick_summary(data_recomb,qis=c('sex','age_group','race_ethnicity_combined'),print=FALSE)
+summarize_utility(data_recomb,qis=c('sex','age_group','race_ethnicity_combined'),print=FALSE)
+```
+
+### Summary of NEW version
+
+```{r ft.align="left"}
+quick_summary(data_resep,qis=c('sex','age_group','race','ethnicity'),print=FALSE)
+summarize_utility(data_resep,qis=c('sex','age_group','race','ethnicity'),print=FALSE)
+```
+
+## Methods
+
+### First, how many records in NEW have NA race or ethnicity and OLD has a combined that's not NA?
+
+There are `r nrow(data_resep_na)` records in NEW where __race__ is NA or __ethnicity__ is NA.
+
+When I join NEW back to OLD on all the shared column, there are `r nrow(resep_na_recomb)` records. However this might have some dupes where a record in NEW could have more than 1 records in OLD. If there are more than one match in OLD, that makes it harder to link records and reidentify.
+
+```{r}
+#we want to know how many specific records match in OLD, how many dupes
+resep_na_recomb_cols <- colnames(resep_na_recomb)
+non_race_eth_cols <- resep_na_recomb_cols[!is.element(resep_na_recomb_cols, c("race","ethnicity","race_ethnicity_combined","index"))] #don't want to include index as a group by var
+
+summary_resep_na_recomb <- resep_na_recomb %>%
+  group_by_at(non_race_eth_cols) %>%
+  summarise(old_matches = n())
+```
+
+When we look at how frequently the 11 shared columns occur, we see that there's only `r nrow(summary_resep_na_recomb)` unique combinations of 11 fields, so there's definitely some dupes.
+
+How many NEW 11 col combos  have exactly 1 OLD? `r nrow(subset(summary_resep_na_recomb, old_matches == 1)) #8`
+
+How many NEW 11 col combos have more than 1 OLD? `r nrow(subset(summary_resep_na_recomb, old_matches > 1)) #0`
+
+How many NEW records have more than 1 OLD? `r sum(subset(summary_resep_na_recomb, old_matches > 1)$old_matches) # 0`
+
+How many NEW records have more than 5 OLD? `r nrow(subset(summary_resep_na_recomb, old_matches >= 5)) #0`
+
+### Let's filter that down to only potentially risky records
+
+Let's join in that summary so we know how many OLD records for each NEW.
+```{r}
+resep_na_recomb_with_n <- inner_join(resep_na_recomb, summary_resep_na_recomb)
+nrow(resep_na_recomb_with_n) #8- same as before join
+```
+
+```{r}
+resep_na_recomb_with_n_race_eth_not_na <- subset(resep_na_recomb_with_n, race_ethnicity_combined != 'NA')
+```
+How many records remain, when we only look at records where OLD.race_ethnicity_combined != NA? **`r nrow(resep_na_recomb_with_n_race_eth_not_na) #6`**
+
+```{r}
+resep_na_recomb_with_n_race_eth_not_na_unk_mis <- subset(resep_na_recomb_with_n_race_eth_not_na, race_ethnicity_combined != 'Missing' & race_ethnicity_combined != 'Unknown')
+```
+How many records remain, when we only look at useful values? Since "Missing" and "Unknown" values do not reveal enough information to increase reidentification risk. **`r nrow(resep_na_recomb_with_n_race_eth_not_na_unk_mis) #6`**
+
+### Let's format the dataframe a bit
+
+Here's the first record, with a count of how many old matches, the fk using the old quasis, and the fk using hte new quasis. The fk values aren't directly comparable because datasets are generated independently. But I think these are useful to tell the relative risk of the current suppressions before an intruder bypasses suppressions.
+```{r}
+#let's chop off to only quasi columns, and original index
+risky_new_draft <- resep_na_recomb_with_n_race_eth_not_na_unk_mis[c('sex','ethnicity','age_group','race','race_ethnicity_combined','old_matches','index')]
+
+#I guess we want fk for each as well, using all 4 NEW quasis, and all 3 OLD quasis
+summary_old_fk <- data_recomb %>%
+  group_by(sex, race_ethnicity_combined,age_group) %>%
+  summarise(old_fk = n())
+
+summary_new_fk <- data_resep %>%
+  group_by(sex, ethnicity, age_group, race) %>%
+  summarise(new_fk = n())
+
+risky_new_oldfk <- inner_join(risky_new_draft, summary_old_fk)
+risky_new_newfk <- inner_join(risky_new_oldfk, summary_new_fk)
+nrow(risky_new_newfk) #6, same as before joins
+```
+
+`r head(risky_new_newfk,1)`
+
+As a sanity check, I want to use the values from that first record to manually look up the frequencies of the old quasies (**`r nrow(subset(data_recomb, sex=='NA' & race_ethnicity_combined == 'American Indian/Alaska Native, Non-Hispanic' & age_group == 'NA'))`**) and the new quasis (**`r nrow(subset(data_resep, sex=='NA' & race == 'NA' & ethnicity == 'Non-Hispanic/Latino' & age_group == 'NA'))`**)
+
+### How many records are at risk?
+
+```{r}
+risky_new_records <- risky_new_newfk
+```
+How many NEW records have race or ethnicity suppressed that can be linked to OLD? **`r nrow(risky_new_records) #6`**
+
+```{r}
+risky_new_records_singles <- subset(risky_new_records, old_matches == 1)
+```
+But we actually want to know how many can be linked to only a single record...**`r nrow(risky_new_records_singles) #6`**
+
+And from that, we can answer a few specific questions...
+
+* How many NEW race values can be derived from OLD? **`r nrow(subset(risky_new_records_singles, race == 'NA')) #6`**
+* Some of the race_ethnicity_combined values are 'Hispanic/Latino' and that doesn't reveal a race value. How many actual values of race can be found? **`r nrow(subset(risky_new_records_singles, race == 'NA' & race_ethnicity_combined != 'Hispanic/Latino')) #6`**
+* How many NEW ethnicity values can be derived from OLD? **`r nrow(subset(risky_new_records_singles, ethnicity == 'NA')) #0`**
+* How many NEW race values are suppressed? `r nrow(subset(data_resep, race == 'NA')) #44`
+* How many NEW ethnicity values are suppressed? `r nrow(subset(data_resep, ethnicity == 'NA')) #2`
+* What percent of NEW suppressed race value can be circumvented? **`r percent(nrow(subset(risky_new_records_singles, race == 'NA' & race_ethnicity_combined != 'Hispanic/Latino'))/nrow(subset(data_resep, race == 'NA'))) #13.64%`**
+* What percent of NEW suppressed ethnicity value can be circumvented? **`r percent(nrow(subset(risky_new_records_singles, ethnicity == 'NA'))/nrow(subset(data_resep, ethnicity == 'NA'))) #0.00%`**
+
+### What is the estimated k-anonymity using the circumvented values?
+
+Just because records can be linked from NEW to OLD to derive true values from suppressed doesn't mean that they become risky. We need to know if any of these violate our privacy threshold, k=5.
+
+We want to use the values from __race_ethnicity_combined__ and impute the values for __race__ and __ethnicity__, then check the new k-anonymity frequency. We'll do this manually in R and then using sdcMicro.
+
+#### Manual first
+
+```{r}
+risky_records_recoded <- subset(risky_new_records_singles, race == 'NA' | ethnicity == 'NA')
+risky_records_recoded$race_orig <- risky_records_recoded$race
+risky_records_recoded$ethnicity_orig <- risky_records_recoded$ethnicity
+
+
+#recoding race
+cat('how many records need race replaced?',length(which(risky_records_recoded$race=='NA' & risky_records_recoded$race_ethnicity_combined!='Hispanic/Latino')),'\n')
+temp_split= separate(risky_records_recoded, race_ethnicity_combined, c("race_temp","ethnicity_temp"),sep = ', ', fill='left')
+risky_records_recoded$race <- ifelse((risky_records_recoded$race == 'NA' & risky_records_recoded$race_ethnicity_combined != 'Hispanic/Latino'),temp_split$race_temp,risky_records_recoded$race)
+#unique(risky_records_recoded$race)
+cat('I just replaced, now how many records need race replaced?',length(which(risky_records_recoded$race=='NA' & risky_records_recoded$race_ethnicity_combined!='Hispanic/Latino')),'(should be zero)\n')
+
+#recoding ethnicity
+cat('how many records need ethnicity replaced?',length(which(risky_records_recoded$ethnicity=='NA')),'\n')
+
+risky_records_recoded$ethnicity <- ifelse(risky_records_recoded$ethnicity == 'NA', temp_split$ethnicity_temp,risky_records_recoded$ethnicity)
+risky_records_recoded$ethnicity <- ifelse(startsWith(risky_records_recoded$ethnicity, 'Non-Hispanic'),'Non-Hispanic/Latino', risky_records_recoded$ethnicity)
+
+cat('I just replaced, now how many records need ethnicity replaced?',length(which(risky_records_recoded$ethnicity=='NA')),'(should be zero)\n')
+#unique(risky_records_recoded$race)
+#unique(risky_records_recoded$ethnicity)
+
+```
+
+OK, so now I have **`r nrow(risky_records_recoded) #6`** records where I've recoded race and ethnicity based on the combined in OLD.
+
+Here's the ALL 6...
+
+`r head(risky_records_recoded,15)`
+
+Now I want to figure out the recoded k-anonymity frequencies. To figure this out, I need put the recoded values into NEW and then recalculate frequencies.
+
+```{r ft.align="left"}
+data_resep_recoded <- left_join(data_resep, risky_records_recoded, by = 'index', suffix=c('','.recoded'))
+data_resep_recoded$race <- ifelse(is.na(data_resep_recoded$race.recoded),data_resep_recoded$race,data_resep_recoded$race.recoded)
+length(which(data_resep_recoded$race=='NA'))
+data_resep_recoded$ethnicity <- ifelse(is.na(data_resep_recoded$ethnicity.recoded),data_resep_recoded$ethnicity,data_resep_recoded$ethnicity.recoded)
+length(which(data_resep_recoded$ethnicity=='NA'))
+
+summary_recoded_fk <- data_resep_recoded %>%
+  group_by(sex, ethnicity, age_group, race) %>%
+  summarise(recoded_fk = n())
+
+#I want to use left, not inner because missing quasi-sets in NEW means this is a new quasi-set
+risky_records_recoded2 <- left_join(risky_records_recoded, summary_recoded_fk)
+
+head(risky_records_recoded2,15)
+```
+We should have the same number of records in the recoded data frame: **`r nrow(risky_records_recoded2)`**. Here are the all records with recoded added...
+
+Every time we see a recoded_fk=NA that means it is less than 5 because that combination wasn't even in NEW. There are **`r nrow(subset(risky_records_recoded2, is.na(recoded_fk) | recoded_fk < 5))`** records <5.
+
+Let's sanity check some of those records...
+
+What about that 1st row? It had race_ethnicity_combined="American Indian/Alaska Native, Non-Hispanic" so changed ethnicity from NA->Non-Hispanic/Latino but race stayed NA. We should see 0 records in NEW and 2 with the recoded values.
+
+#### Suppressed values (should be 0 records)
+`r subset(data_resep, sex=='NA' & ethnicity=='Non-Hispanic/Latino'  & age_group=='NA' & race=='American Indian/Alaska Native')`
+
+#### Recoded values (should be 2 records)
+`r subset(data_resep, sex=='NA' & ethnicity=='NA' & age_group=='NA' & race=='NA')`
+
+The 4th row had race_ethnicity_combined=Native Hawaiian/Other Pacific Islander, Non-Hispanic so changed race from NA->Native Hawaiian/Other Pacific Islander; and ethnicity from NA->Non-Hispanic/Latino. Looking at k-anonymity frequency for the suppressed values we should see 0 records and recoded there should be 2.
+
+#### Suppressed values (should be 0 records)
+`r subset(data_resep, sex=='NA' & ethnicity=='Non-Hispanic/Latino' & age_group=='NA' & race=='Native Hawaiian/Other Pacific Islander')`
+
+#### Recoded values (should be 2 records)
+`r subset(data_resep, sex=='NA' & ethnicity=='NA' & age_group=='NA' & race=='NA')`
+
+OK, that seems as expected, so with this info how many of the records in NEW are below our privacy threshold,k=5? **`r nrow(subset(risky_records_recoded2, is.na(recoded_fk)|recoded_fk<5)) #6`** or **`r percent(nrow(subset(risky_records_recoded2, is.na(recoded_fk)|recoded_fk<5))/nrow(subset(data_resep, race=='NA'|ethnicity=='NA'))) #13.64%`** of all `r nrow(subset(data_resep, race=='NA'|ethnicity=='NA'))` records with a race or ethnicity value suppressed.
+
+Race, specifically? **`r nrow(subset(risky_records_recoded2, (is.na(recoded_fk)|recoded_fk<5) & race_orig=='NA' & race_ethnicity_combined!='Non-Hispanic/Latino')) #6`** or **`r percent(nrow(subset(risky_records_recoded2, (is.na(recoded_fk)|recoded_fk<5) & race_orig=='NA' & race_ethnicity_combined!='Non-Hispanic/Latino'))/nrow(subset(data_resep, race=='NA'))) #13.64%`** of `r nrow(subset(data_resep, race=='NA'))` all race values suppressed.
+
+Ethnicity, specifically? **`r nrow(subset(risky_records_recoded2, (is.na(recoded_fk)|recoded_fk<5) & ethnicity_orig=='NA' )) #0`** or **`r percent(nrow(subset(risky_records_recoded2, (is.na(recoded_fk)|recoded_fk<5) & ethnicity_orig=='NA'))/nrow(subset(data_resep, ethnicity=='NA'))) #0.00%`** of `r nrow(subset(data_resep, ethnicity=='NA'))` all ethnicity values suppressed.
+
+### sdcMicro with alpha=0 (NA, Unknown, Missing as indepdent categories)
+
+Here's the first 15 records of recoded NEW, for purposes of sdcmicro, we'll ignore all the values that aren't actually quasi-identifiers, so all those extra columns don't matter...
+`r head(data_resep_recoded,15)`
+
+```{r ft.align="left"}
+resep_quasi_identifiers = c('sex','ethnicity','age_group','race')
+KANON_LEVEL <- 5
+sdcObj <- createSdcObj(dat=data_resep_recoded,
+                       keyVars=resep_quasi_identifiers,
+                       numVars=NULL,
+                       weightVar=NULL,
+                       hhId=NULL,
+                       strataVar=NULL,
+                       pramVars=NULL,
+                       excludeVars=NULL,
+                       seed=0,
+                       randomizeRecords=FALSE,
+                       alpha=c(0))
+
+# print to confirm observations, num variables, quasis, quasi describes, and risk info
+sdc_print(sdcObj, KANON_LEVEL)
+
+# this should be zero
+fk <- summarize_violations(data_resep_recoded, sdcObj, KANON_LEVEL, resep_quasi_identifiers)
+
+data_resep_recoded_fk <- cbind(data_resep_recoded, fk)
+k_anon_violations_alpha0 <- subset(data_resep_recoded_fk, fk<5)
+k_anon_violations_alpha0
+
+#k_anon_violations_alpha0[order(fk),]
+
+#subset(data_resep_recoded_fk, sex=='NA' & ethnicity=='NA' & age_group=='NA' & race=='NA')
+
+```
+So there're  **`r nrow(k_anon_violations_alpha0)`** k-anon violations if we use alpha=c(0)) and not recode_to_na for dataset.
+
+### sdcMicro with alpha=1 (NA, Unknown, Missing recoded to null and treated as wildcards)
+
+We will recode all quasi-identifier values of "NA", "Missing" or "Unknown" to actual NA (null) and use sdcmicro's alpha parameter to indicate that NA values should be treated as wildcards. So rather than "Missing" being it's own cell, it's just ignored for purposes of k-anonymity.
+
+```{r ft.align="left"}
+data_resep_recoded_true_na <- recode_to_na(data_resep_recoded,resep_quasi_identifiers,BLANK_CATEGORIES)
+```
+
+You can now see true NA values in this version...
+`r head(data_resep_recoded_true_na,15)`
+
+```{r ft.align="left"}
+sdcObj <- createSdcObj(dat=data_resep_recoded_true_na,
+                       keyVars=resep_quasi_identifiers,
+                       numVars=NULL,
+                       weightVar=NULL,
+                       hhId=NULL,
+                       strataVar=NULL,
+                       pramVars=NULL,
+                       excludeVars=NULL,
+                       seed=0,
+                       randomizeRecords=FALSE,
+                       alpha=c(1))
+
+# print to confirm observations, num variales, quasis, quasi describes, and risk info
+sdc_print(sdcObj, KANON_LEVEL)
+
+# this should be zero
+fk <- summarize_violations(data_resep_recoded_true_na, sdcObj, KANON_LEVEL, resep_quasi_identifiers)
+
+data_resep_recoded_true_na_fk <- cbind(data_resep_recoded_true_na, fk)
+k_anon_violations_alpha1 <- subset(data_resep_recoded_true_na_fk, fk<5)
+```
+
+So the good news is that now we don't have k-anon violations, `r nrow(k_anon_violations_alpha1)` and here's the results ordered by smalled fk...
+`r data_resep_recoded_true_na_fk[order(fk),]`
+
+## Summary
+
+* NEW race values that can be deduced from OLD race_ethnicity_combined: **`r nrow(subset(risky_new_records_singles, race == 'NA' & race_ethnicity_combined != 'Hispanic/Latino')) #6`** (**`r percent(nrow(subset(risky_new_records_singles, race == 'NA' & race_ethnicity_combined != 'Hispanic/Latino'))/nrow(subset(data_resep, race == 'NA'))) #13.64%`** of `r commas(nrow(subset(data_resep, race == 'NA'))) #44` )
+* NEW ethnicity values that can be deduced from OLD race_ethnicity_combined: **`r nrow(subset(risky_new_records_singles, ethnicity == 'NA')) #0`** (**`r percent(nrow(subset(risky_new_records_singles, ethnicity == 'NA'))/nrow(subset(data_resep, ethnicity == 'NA'))) #0.00%`** of `r commas(nrow(subset(data_resep, ethnicity == 'NA'))) #2`)
+* NEW records that are below k=5: **`r nrow(subset(risky_records_recoded2, is.na(recoded_fk)|recoded_fk<5)) #6`** or **`r percent(nrow(subset(risky_records_recoded2, is.na(recoded_fk)|recoded_fk<5))/nrow(subset(data_resep, race=='NA'|ethnicity=='NA'))) #13.64%`** of all `r nrow(subset(data_resep, race=='NA'|ethnicity=='NA'))` records with a race or ethnicity value suppressed.
+  * Race, specifically? **`r nrow(subset(risky_records_recoded2, (is.na(recoded_fk)|recoded_fk<5) & race_orig=='NA' & race_ethnicity_combined!='Hispanic/Latino')) #6`** or **`r percent(nrow(subset(risky_records_recoded2, (is.na(recoded_fk)|recoded_fk<5) & race_orig=='NA' & race_ethnicity_combined!='Hispanic/Latino'))/nrow(subset(data_resep, race=='NA'))) #13.64%`** of `r nrow(subset(data_resep, race=='NA'))` all race values suppressed.
+  * Ethnicity, specifically? **`r nrow(subset(risky_records_recoded2, (is.na(recoded_fk)|recoded_fk<5) & ethnicity_orig=='NA' )) #0`** or **`r percent(nrow(subset(risky_records_recoded2, (is.na(recoded_fk)|recoded_fk<5) & ethnicity_orig=='NA'))/nrow(subset(data_resep, ethnicity=='NA'))) #0.00%`** of `r nrow(subset(data_resep, ethnicity=='NA'))` all ethnicity values suppressed.
+* sdcMicro k-anonymity violations below k=5: **`r nrow(k_anon_violations_alpha0)`**
+* sdcMicro k-anonymity violations below k=5 when we recode NA, Missing, Unknown as wildcards: **`r nrow(k_anon_violations_alpha1)`**
+
+Recommendation: 
+
+* Work with case team to update suppression logic using wildcards it may reduce the risk for these 6 records.
+
+## Appendix A: Risky records
+
+```{r ft.align="left"}
+head(subset(risky_new_records_singles, race == 'NA' & race_ethnicity_combined != 'Hispanic/Latino'),20)
+```
+
+## Appendix B: SDCMicro K-anonymization violations
+
+```{r ft.align="left"}
+head(data_resep_recoded_fk[order(data_resep_recoded_fk$fk),],20)
+```
+
+
+## Appendix C: SDCMicro K-anonymization with wildcards, sorted ascending k
+
+```{r ft.align="left"}
+head(data_resep_recoded_true_na_fk[order(data_resep_recoded_true_na_fk$fk),],20)
+```
+
+
