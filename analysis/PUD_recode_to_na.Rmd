@@ -1,0 +1,104 @@
+---
+title: "PUD (13 vars): Correct the k-anon violations (2)"
+#author: "Nimesh Patel"
+latex_engine: xelatex
+geometry: top = 1cm, bottom=1cm, left=2cm, right=1cm
+output:
+  pdf_document: default
+  word_document: default
+  html_document:
+    df_print: paged
+  tables:
+    style: Table
+    layout: autofit
+    width: 4.5
+    caption:
+      style: Table Caption
+      pre: 'Table '
+      sep: ': '
+    conditional:
+      first_row: true
+      first_column: false
+      last_row: false
+      last_column: false
+      no_hband: false
+      no_vband: true
+classoption: landscape
+---
+\pagenumbering{gobble}
+```{r setup, include=FALSE}
+
+cat(toString(Sys.time()))
+source("../R/functions.R")
+library(flextable)
+library(arrow)
+library(sdcMicro)
+
+report_dir = "../reports"
+out_dir = "../output"
+data_dir = "../data/raw"
+
+KANON_LEVEL <- 5
+KANON_LEVEL
+LDIV_LEVEL <- 2
+LDIV_LEVEL
+
+quasi_identifiers = c("sex","age_group","race","ethnicity")
+confidential_attributes = c("pos_spec_dt")
+
+file_name <- "COVID_Cases_Public_Limited_20210422_13_vars.parquet"
+
+suppressed_file_name = paste(out_dir,"/",file_name,".suppressed.csv",sep="")
+public_file_name = paste(data_dir,"/",file_name,sep="")
+print(public_file_name)
+df = read_parquet(public_file_name, as_data_frame = TRUE)
+data <- data.frame(df)
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Summarize existing utility
+```{r ft.align="left"}
+quick <- quick_summary(data, label="all_fields", qis=quasi_identifiers)
+
+```
+## Summarize existing utility
+```{r ft.align="left"}
+utility <- summarize_utility(data, quasi_identifiers)
+
+```
+
+## Recoding all the "NA" (already suppressed), Missings and Unknowns to NA for purposes of k-anonymity
+
+```{r ft.align="left"}
+data_na <- recode_to_na(data,quasi_identifiers,BLANK_CATEGORIES)
+```
+## Set up sdcMicro object, using data_na and change alpha=c(0)) to alpha=c(1)) to correct a k-anon violations (2) problem: 
+  *Output from using data before recode to na and alpha=c(0)): 
+  *a k-anon violations ( 2 ) for k=( 5 ) and quasi-identifiers ( race ethnicity sex age_group ). 
+  *If greater than zero violations, then here's 5 violations. race ethnicity sex age_group fk
+  *15600394 NA NA NA NA 2
+  *15600393 NA NA NA NA 2
+
+```{r ft.align="left"}
+sdcObj <- createSdcObj(dat=data_na,
+                       keyVars=quasi_identifiers,
+                       numVars=NULL,
+                       weightVar=NULL,
+                       hhId=NULL,
+                       strataVar=NULL,
+                       pramVars=NULL,
+                       excludeVars=NULL,
+                       seed=0,
+                       randomizeRecords=FALSE,
+                       alpha=c(1))
+
+# print to confirm observations, num variales, quasis, quasi describes, and risk info
+sdc_print(sdcObj, KANON_LEVEL)
+```
+## Print out the number of violations and a sample: k-anon violations should be zero
+```{r ft.align="left"}
+fk = summarize_violations(data_na, sdcObj, KANON_LEVEL, quasi_identifiers)
+
+```
+
+
+

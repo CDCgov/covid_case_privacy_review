@@ -89,7 +89,7 @@ summarize_utility <- function(data, qis, print = TRUE){
 
   suppressed <-sapply(df, function(y) sum(length(which(y=="NA"))))
   suppressed_percent <- suppressed/num_total_recs
-  missing <-sapply(data[qis], function(y) sum(length(which(y=="Missing"))))
+  missing <-sapply(df, function(y) sum(length(which(y=="Missing"))))
   missing_percent <- missing/num_total_recs
 
   utility_summary <- data.frame("suppressed"=commas(suppressed),
@@ -98,11 +98,19 @@ summarize_utility <- function(data, qis, print = TRUE){
                                 "missing_percent"=percent(missing_percent,1))
 
   #num_records_with_suppression <- sum(apply(df,1, function(y) sum(which(any(y=="NA")))))
+<<<<<<< HEAD
   num_records_with_suppression = sum(rowSums(sapply(data[qis], function(y) y=="NA")) > 0)
   pct_records_with_suppression = num_records_with_suppression/num_total_recs
 
   #num_records_with_missing <- sum(apply(df,1, function(y) sum(which(any(y=="Missing")))))
   num_records_with_missing = sum(rowSums(sapply(data[qis], function(y) y=="Missing")) > 0)
+=======
+  num_records_with_suppression = sum(rowSums(sapply(df, function(y) y=="NA")) > 0)
+  pct_records_with_suppression = num_records_with_suppression/num_total_recs
+
+  #num_records_with_missing <- sum(apply(df,1, function(y) sum(which(any(y=="Missing")))))
+  num_records_with_missing = sum(rowSums(sapply(df, function(y) y=="Missing")) > 0)
+>>>>>>> 0186bb01ba12791468746b9af1da85af5e878dcd
   pct_records_with_missing = num_records_with_missing/num_total_recs
 
   utility_summary["records_with_any_field",] = list("suppressed"=commas(num_records_with_suppression),
