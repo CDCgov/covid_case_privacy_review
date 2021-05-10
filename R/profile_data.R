@@ -17,17 +17,17 @@ data_dir = "../data/raw"
 
 # now there's two datasets, so profile each one...
 # change these depending on the data set...
-#public_file_name <- "COVID_Cases_Public_Limited_20210430.csv"
-public_file_name <- "COVID_Cases_Public_Limited_20210430.parquet"
+#public_file_name <- "COVID_Cases_Public_Limited_20210510.csv"
+public_file_name <- "COVID_Cases_Public_Limited_20210510.parquet"
 public_detailed_file_name <- paste(data_dir,"/",public_file_name,sep="")
 #public_report_file_name <- sub(".csv","csv_profile.html",public_file_name)
 public_report_file_name <- sub(".parquet","_parquet_profile.html",public_file_name)
-public_report_title <- "COVID-19 Case Surveillance Public Use Data Profile (2021-04-30 version)"
+public_report_title <- "COVID-19 Case Surveillance Public Use Data Profile (2021-05-10 version)"
 
-public_geo_file_name <- "public_county_geography_2021-04-30.parquet"
+public_geo_file_name <- "public_county_geography_2021-05-10.parquet"
 public_geo_detailed_file_name <- paste(data_dir,"/",public_geo_file_name,sep="")
 public_geo_report_file_name <- sub(".parquet","_profile.html",public_geo_file_name)
-public_geo_report_title <- "COVID-19 Case Surveillance Public Use Data with Geography Profile (2021-04-30 version)"
+public_geo_report_title <- "COVID-19 Case Surveillance Public Use Data with Geography Profile (2021-05-10 version)"
 
 cat("Processing file:", public_detailed_file_name,"\n\n")
 
