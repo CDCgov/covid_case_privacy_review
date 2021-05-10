@@ -1,6 +1,6 @@
 ---
 latex_engine: xelatex
-geometry: top = 1cm, bottom=1cm, left=2cm, right=2cm
+geometry: top = 1cm, bottom=1cm, left=1.5cm, right=2cm
 output:
   pdf_document: default
   html_document:
@@ -31,11 +31,11 @@ library(flextable)
 #data_dir = "../data/raw"
 data_dir = "../data/raw"
 
-file_name <- "COVID_Cases_Public_Limited_20210430.parquet"
+file_name <- "COVID_Cases_Public_Limited_20210510.parquet"
 detailed_file_name = paste(data_dir,"/",file_name,sep="")
 
 #change me to whatever version you want to display
-dataset_version <- "2021-04-30"
+dataset_version <- "2021-05-10"
 
 quasi_identifiers = c("race_ethnicity_combined","sex","age_group")
 
