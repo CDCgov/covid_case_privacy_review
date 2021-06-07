@@ -1306,3 +1306,225 @@ Processing check for county/state complementary offsets (rule #10), should be 0.
 
 County/state complementary violations ( 0 ). If greater than zero violations, then here's states with violations.
 ```
+
+## 2021-06-07
+
+[DataExplorer Profile Report](../reports/COVID_Cases_Public_Limited_2021-05-24_parquet_profile.html)
+
+```
+
+[1] "../data/raw/COVID_Cases_Public_Limited_20210607.parquet"
+
+
+[1] "Quick summary:"
+                  all_fields  quasi_fields
+total_fields      12          3           
+total_records     26,616,527  26,616,527  
+total_cells       319,398,324 79,849,581  
+missing_fields    65,440,400  882,419     
+missing_pct       20%         1%          
+complete_fields   253,957,924 78,967,162  
+complete_pct      80%         99%         
+unknown_fields    22,366,356  9,519,783   
+unknown_pct       7%          12%         
+suppressed_fields 100         100         
+suppressed_pct    0%          0%          
+available_fields  231,591,468 69,447,279  
+available_pct     73%         87%         
+
+
+Utility summary:
+Total records in dataset: 26,616,527 
+                        suppressed suppressed_percent missing missing_percent
+race_ethnicity_combined         12               0.0% 648,767            2.4%
+sex                             18               0.0%  53,494            0.2%
+age_group                       70               0.0% 180,158            0.7%
+records_with_any_field          70               0.0% 821,755            3.1%
+
+
+SDC summary for k-anon-level( 5 ).
+The input dataset consists of 26616527 rows and 12 variables.
+  --> Categorical key variables: race_ethnicity_combined, sex, age_group
+----------------------------------------------------------------------
+
+
+Information on categorical key variables:
+
+Reported is the number, mean size and size of the smallest category >0 for recoded variables.
+In parenthesis, the same statistics are shown for the unmodified data.
+Note: NA (missings) are counted as seperate categories!
+
+
+            Key Variable Number of categories        Mean size               Size of smallest (>0)          
+ race_ethnicity_combined                    8  (8) 2383545.143 (2383545.143)                 46639   (46639)
+                     sex                    4  (4) 8775388.000 (8775388.000)                   471     (471)
+               age_group                   10 (10) 2937366.556 (2937366.556)               1019163 (1019163)
+----------------------------------------------------------------------
+
+
+Risk measures:
+
+Number of observations with higher risk than the main part of the data: 89
+Expected number of re-identifications: 157.28 (0.00 %)
+
+
+
+k-anon violations ( 0 ) for k=( 5 ) and quasi-identifiers ( race_ethnicity_combined sex age_group ). If greater than zero violations, then here's 5 violations.
+
+
+Writing out a privacy eval report to: ../reports/COVID_Cases_Public_Limited_20210607.parquet.html 
+
+
+Processing l-diversity ( 2 ) checks for < ../data/raw/COVID_Cases_Public_Limited_20210524.parquet > that has < 25607582 > records; < 12 > variables; < 3 > quasi-identifiers ( race_ethnicity_combined sex age_group ); and < 1 > confidential attributes ( pos_spec_dt ).
+
+
+checking l-diversity manually for < pos_spec_dt >, found < 0 > l-diversity violations.
+[1] race_ethnicity_combined sex                     age_group               pos_spec_dt             fk                     
+[6] ldiv                   
+<0 rows> (or 0-length row.names)
+```
+
+## 2021-06-07 Public Geo
+
+[DataExplorer Profile](../reports/public_county_geography_2021-06-07_profile.html)
+
+```
+[1] "../data/raw/public_county_geography_2021-06-07.parquet"
+
+
+[1] "Quick summary:"
+                  all_fields  quasi_fields
+total_fields      19          8           
+total_records     26,616,527  26,616,527  
+total_cells       505,714,013 212,932,216 
+missing_fields    107,420,479 13,628,374  
+missing_pct       21%         6%          
+complete_fields   398,293,534 199,303,842 
+complete_pct      79%         94%         
+unknown_fields    25,307,914  13,268,263  
+unknown_pct       5%          6%          
+suppressed_fields 15,885,216  14,061,381  
+suppressed_pct    3%          7%          
+available_fields  357,100,404 171,974,198 
+available_pct     71%         81%         
+
+
+Utility summary:
+Total records in dataset: 26,616,527 
+                       suppressed suppressed_percent    missing missing_percent
+case_month                      0               0.0%          0            0.0%
+res_state                     678               0.0%          0            0.0%
+res_county              1,823,157               6.8%          0            0.0%
+age_group                 292,661               1.1%    168,849            0.6%
+sex                       775,476               2.9%     32,570            0.1%
+race                    4,493,073              16.9%  2,130,399            8.0%
+ethnicity               5,391,156              20.3%  1,701,108            6.4%
+death_yn                1,285,180               4.8%  9,595,448           36.1%
+records_with_any_field  7,643,130              28.7% 10,736,589           40.3%
+
+
+
+Processing checks for linked fields ( res_state county_fips_code state_fips_code res_county res_county county_fips_code )
+linked variable violations ( 0 ) for source_field=( res_state ) and linked_field=( county_fips_code ). If greater than zero violations, then here's 5 violations.
+
+
+linked variable violations ( 0 ) for source_field=( res_state ) and linked_field=( state_fips_code ). If greater than zero violations, then here's 5 violations.
+
+
+linked variable violations ( 0 ) for source_field=( res_state ) and linked_field=( res_county ). If greater than zero violations, then here's 5 violations.
+
+
+linked variable violations ( 0 ) for source_field=( res_county ) and linked_field=( county_fips_code ). If greater than zero violations, then here's 5 violations.
+
+
+Processing check for states and counties having at least 1,000 cases (rules #1,2), should be 0.
+
+
+SDC summary for k-anon-level( 1000 ).
+The input dataset consists of 26616527 rows and 19 variables.
+  --> Categorical key variables: res_state, res_county
+----------------------------------------------------------------------
+
+
+Information on categorical key variables:
+
+Reported is the number, mean size and size of the smallest category >0 for recoded variables.
+In parenthesis, the same statistics are shown for the unmodified data.
+Note: NA (missings) are counted as seperate categories!
+
+
+ Key Variable Number of categories         Mean size              Size of smallest (>0)       
+    res_state                   55   (55) 492886.093 (492886.093)                  1284 (1284)
+   res_county                 1022 (1022)  24283.418  (24283.418)                  1029 (1029)
+----------------------------------------------------------------------
+
+
+Risk measures:
+
+Number of observations with higher risk than the main part of the data: 0
+Expected number of re-identifications: 1525.51 (0.01 %)
+
+
+k-anon violations ( 0 ) for k=( 1000 ) and quasi-identifiers ( res_state res_county ). If greater than zero violations, then here's 5 violations.
+
+
+Processing check for k-anonymity 11 across all quasi-identifiers (rule #6), should be 0.
+
+SDC summary for k-anon-level( 11 ).
+The input dataset consists of 26616527 rows and 19 variables.
+  --> Categorical key variables: case_month, res_state, res_county, age_group, sex, race, ethnicity, death_yn
+----------------------------------------------------------------------
+
+
+Information on categorical key variables:
+
+Reported is the number, mean size and size of the smallest category >0 for recoded variables.
+In parenthesis, the same statistics are shown for the unmodified data.
+Note: NA (missings) are counted as seperate categories!
+
+
+ Key Variable Number of categories          Mean size               Size of smallest (>0)          
+   case_month                   17   (17) 1565678.059 (1565678.059)                  4560    (4560)
+    res_state                   55   (55)  492886.093  (492886.093)                  1284    (1284)
+   res_county                 1022 (1022)   24283.418   (24283.418)                  1029    (1029)
+    age_group                    5    (5) 6538754.250 (6538754.250)               3220535 (3220535)
+          sex                    4    (4) 8544097.333 (8544097.333)                    12      (12)
+         race                    7    (7) 2608652.500 (2608652.500)                 29907   (29907)
+    ethnicity                    3    (3) 6812190.000 (6812190.000)               2363914 (2363914)
+     death_yn                    3    (3) 6442424.000 (6442424.000)                275353  (275353)
+----------------------------------------------------------------------
+
+
+Risk measures:
+
+Number of observations with higher risk than the main part of the data: 0
+Expected number of re-identifications: 28189.38 (0.11 %)
+
+
+k-anon violations ( 0 ) for k=( 11 ) and quasi-identifiers ( case_month res_state res_county age_group sex race ethnicity death_yn ). If greater than zero violations, then here's 5 violations.
+
+
+Writing out a privacy eval report to: ../reports/public_county_geography_2021-06-07.parquet.html 
+
+
+Processing check for low population counties (rule #3), should be 0.
+
+
+Low population county violations ( 6061702 ). If greater than zero violations, then the list of counties with violations and 5 sample violations.
+
+Processing check for low subpopulation demographics in counties (rule #4), should be 0, twice.
+
+Subpopulation county violations, part 1 checking subpopulation for counties ( 119879 ). If greater than zero violations, then here's 5 sample violations.
+
+Subpopulation county violations, part 2, checking to make sure there aren't any res_county that aren't NA but have subpops ( 5941823 ). If greater than zero violations, then here's 5 sample violations.
+
+
+Processing check for case counts by subpopulation (rule #5), should be 0.
+
+Subpopulation population too small for cases ( 119879 ). If greater than zero violations, then here's 5 sample violations.
+
+
+Processing check for county/state complementary offsets (rule #10), should be 0.
+
+County/state complementary violations ( 0 ). If greater than zero violations, then here's states with violations.
+```

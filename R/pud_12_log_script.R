@@ -1,5 +1,5 @@
 
-cat(toString(Sys.time()))
+cat(toString(Sys.time()),"Log Started")
 
 out_dir = "../output"
 
@@ -22,4 +22,4 @@ sink(type="message")
 # And look at the log...
 cat(readLines(pud_log_file), sep="\n")
 
-cat(toString(Sys.time()))
+cat(toString(Sys.time()), "Log ended")

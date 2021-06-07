@@ -26,7 +26,7 @@ quasi_identifiers = c("race_ethnicity_combined","sex","age_group")
 confidential_attributes = c("pos_spec_dt")
 
 #if I use a CSV then there's logic to change down below
-file_name <- "COVID_Cases_Public_Limited_20210524.parquet"
+file_name <- "COVID_Cases_Public_Limited_20210607.parquet"
 #file_name <- "github_test.csv"
 
 suppressed_file_name = paste(out_dir,"/",file_name,".suppressed.csv",sep="")
