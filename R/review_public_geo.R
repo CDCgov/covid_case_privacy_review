@@ -138,10 +138,10 @@ names(county_data)[names(county_data) == 'state_county_combined_fips'] <- 'count
 names(county_data) <- tolower(names(county_data))
 county_data['state_abbr'] = state.abb[match(county_data$stname,state.name)]
 
-data_with_census = merge(x=data, y=county_data, by = 'county_fips_code', all.x = TRUE)
+data_with_census = merge(x=data_na, y=county_data, by = 'county_fips_code', all.x = TRUE)
 
 #if I screw up the merge, that's bad
-stopifnot(nrow(data) == nrow(data_with_census))
+stopifnot(nrow(data_na) == nrow(data_with_census))
 
 #missing census data, assume zero population, so we check if suppressed
 data_with_census$sum_of_tot_pop[is.na(data_with_census$sum_of_tot_pop)] <- 0

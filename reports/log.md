@@ -1309,7 +1309,7 @@ County/state complementary violations ( 0 ). If greater than zero violations, th
 
 ## 2021-06-07
 
-[DataExplorer Profile Report](../reports/COVID_Cases_Public_Limited_2021-05-24_parquet_profile.html)
+[DataExplorer Profile Report](../reports/COVID_Cases_Public_Limited_2021-06-07_parquet_profile.html)
 
 ```
 
