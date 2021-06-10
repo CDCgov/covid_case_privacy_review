@@ -1423,16 +1423,12 @@ death_yn                1,285,180               4.8%  9,595,448           36.1%
 records_with_any_field  7,643,130              28.7% 10,736,589           40.3%
 
 
-
 Processing checks for linked fields ( res_state county_fips_code state_fips_code res_county res_county county_fips_code )
 linked variable violations ( 0 ) for source_field=( res_state ) and linked_field=( county_fips_code ). If greater than zero violations, then here's 5 violations.
 
-
 linked variable violations ( 0 ) for source_field=( res_state ) and linked_field=( state_fips_code ). If greater than zero violations, then here's 5 violations.
 
-
 linked variable violations ( 0 ) for source_field=( res_state ) and linked_field=( res_county ). If greater than zero violations, then here's 5 violations.
-
 
 linked variable violations ( 0 ) for source_field=( res_county ) and linked_field=( county_fips_code ). If greater than zero violations, then here's 5 violations.
 
@@ -1444,7 +1440,6 @@ SDC summary for k-anon-level( 1000 ).
 The input dataset consists of 26616527 rows and 19 variables.
   --> Categorical key variables: res_state, res_county
 ----------------------------------------------------------------------
-
 
 Information on categorical key variables:
 
@@ -1458,7 +1453,6 @@ Note: NA (missings) are counted as seperate categories!
    res_county                 1022 (1022)  24283.418  (24283.418)                  1029 (1029)
 ----------------------------------------------------------------------
 
-
 Risk measures:
 
 Number of observations with higher risk than the main part of the data: 0
@@ -1470,11 +1464,11 @@ k-anon violations ( 0 ) for k=( 1000 ) and quasi-identifiers ( res_state res_cou
 
 Processing check for k-anonymity 11 across all quasi-identifiers (rule #6), should be 0.
 
+
 SDC summary for k-anon-level( 11 ).
 The input dataset consists of 26616527 rows and 19 variables.
   --> Categorical key variables: case_month, res_state, res_county, age_group, sex, race, ethnicity, death_yn
 ----------------------------------------------------------------------
-
 
 Information on categorical key variables:
 
@@ -1494,7 +1488,6 @@ Note: NA (missings) are counted as seperate categories!
      death_yn                    3    (3) 6442424.000 (6442424.000)                275353  (275353)
 ----------------------------------------------------------------------
 
-
 Risk measures:
 
 Number of observations with higher risk than the main part of the data: 0
@@ -1503,26 +1496,21 @@ Expected number of re-identifications: 28189.38 (0.11 %)
 
 k-anon violations ( 0 ) for k=( 11 ) and quasi-identifiers ( case_month res_state res_county age_group sex race ethnicity death_yn ). If greater than zero violations, then here's 5 violations.
 
-
 Writing out a privacy eval report to: ../reports/public_county_geography_2021-06-07.parquet.html 
-
 
 Processing check for low population counties (rule #3), should be 0.
 
-
-Low population county violations ( 6061702 ). If greater than zero violations, then the list of counties with violations and 5 sample violations.
+Low population county violations ( 0 ). If greater than zero violations, then the list of counties with violations and 5 sample violations.
 
 Processing check for low subpopulation demographics in counties (rule #4), should be 0, twice.
 
-Subpopulation county violations, part 1 checking subpopulation for counties ( 119879 ). If greater than zero violations, then here's 5 sample violations.
+Subpopulation county violations, part 1 checking subpopulation for counties ( 0 ). If greater than zero violations, then here's 5 sample violations.
 
-Subpopulation county violations, part 2, checking to make sure there aren't any res_county that aren't NA but have subpops ( 5941823 ). If greater than zero violations, then here's 5 sample violations.
-
+Subpopulation county violations, part 2, checking to make sure there aren't any res_county that aren't NA but have subpops ( 0 ). If greater than zero violations, then here's 5 sample violations.
 
 Processing check for case counts by subpopulation (rule #5), should be 0.
 
-Subpopulation population too small for cases ( 119879 ). If greater than zero violations, then here's 5 sample violations.
-
+Subpopulation population too small for cases ( 0 ). If greater than zero violations, then here's 5 sample violations.
 
 Processing check for county/state complementary offsets (rule #10), should be 0.
 

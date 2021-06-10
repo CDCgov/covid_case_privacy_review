@@ -1,5 +1,5 @@
 
-cat(toString(Sys.time()),"Log Started")
+cat(toString(Sys.time()),"Geo Log Started")
 out_dir = "../output"
 
 log_file_name <- "geo_log_md.log"
@@ -21,4 +21,4 @@ sink(type="message")
 # And look at the log...
 cat(readLines(geo_log_file), sep="\n")
 
-cat(toString(Sys.time()),"Log Ended")
+cat(toString(Sys.time()),"Geo Log Ended")
