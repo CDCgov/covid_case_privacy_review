@@ -30,11 +30,11 @@ library(arrow)
 library(flextable)
 data_dir = "../data/raw"
 
-file_name <- "public_county_geography_2021-06-21.parquet"
+file_name <- "public_county_geography_2021-07-06.parquet"
 detailed_file_name = paste(data_dir,"/",file_name,sep="")
 
 #change me to whatever version you want to display
-dataset_version <- "2021-06-21"
+dataset_version <- "2021-07-06"
 
 location_quasi_identifiers = c("res_state","res_county")
 quasi_identifiers = c("case_month", location_quasi_identifiers, "age_group","sex","race","ethnicity","death_yn")
