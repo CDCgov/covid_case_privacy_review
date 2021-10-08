@@ -106,7 +106,7 @@ No confidential attributes are in this dataset.
 
 This script uses the [sdcMicro](https://cran.r-project.org/web/packages/sdcMicro/) package so much of the output is generated from this package. What we look for is the specific output `linked variable violations ( 0 )`, `k-anon violations ( 0 )`, and `< 0 > l-diversity violations`. If any violations are found then the file is not ready for publication, notify the data team so they can fix the data pipeline.
 
-For the geography checks, there are multiple steps, so output should be reviewed to confirm that all steps have completed without identifying an violations that require correction prior to publishing:
+For the geography checks, there are multiple steps, so output should be reviewed to confirm that all steps have completed without identifying any violations that require correction prior to publishing:
 * `linked variable violations ( 0 ) `
 * `k-anon violations ( 0 ) for k=( 1000 ) and quasi-identifiers ( res_state res_county )`
 * `k-anon violations ( 0 ) for k=( 11 ) and quasi-identifiers ( case_month res_state res_county age_group sex race ethnicity death_yn )`
