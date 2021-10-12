@@ -2634,3 +2634,77 @@ Processing check for county/state complementary offsets (rule #10), should be 0.
 County/state complementary violations ( 1 ). If greater than zero violations, then here's states with violations.
 
 ```
+## 2021-10-12
+
+[DataExplorer Profile Report](../reports/COVID_Cases_Public_Limited_2021-10-12_parquet_profile.html)
+
+```
+
+[1] "../data/raw/COVID_Cases_Public_Limited_20211012.parquet"
+
+
+[1] "Quick summary:"
+                  all_fields  quasi_fields
+total_fields      12          3           
+total_records     34,203,283  34,203,283  
+total_cells       410,439,396 102,609,849 
+missing_fields    84,413,564  1,226,339   
+missing_pct       21%         1%          
+complete_fields   326,025,832 101,383,510 
+complete_pct      79%         99%         
+unknown_fields    27,033,127  11,356,933  
+unknown_pct       7%          11%         
+suppressed_fields 101         101         
+suppressed_pct    0%          0%          
+available_fields  298,992,604 90,026,476  
+available_pct     73%         88%          
+
+
+
+Utility summary:
+Total records in dataset: 34,203,283 
+                        suppressed suppressed_percent   missing missing_percent
+race_ethnicity_combined         11               0.0%   800,657            2.3%
+sex                             17               0.0%    72,100            0.2%
+age_group                       73               0.0%   353,582            1.0%
+records_with_any_field          73               0.0% 1,139,091            3.3%
+
+
+SDC summary for k-anon-level( 5 ).
+The input dataset consists of 34203283 rows and 12 variables.
+  --> Categorical key variables: race_ethnicity_combined, sex, age_group
+----------------------------------------------------------------------
+
+
+Information on categorical key variables:
+
+Reported is the number, mean size and size of the smallest category >0 for recoded variables.
+In parenthesis, the same statistics are shown for the unmodified data.
+Note: NA (missings) are counted as seperate categories!
+
+
+            Key Variable Number of categories         Mean size               
+ race_ethnicity_combined                    8  (8)  3190522.571  (3190522.571)
+                     sex                    4  (4) 11281063.333 (11281063.333)
+               age_group                   10 (10)  3761069.778  (3761069.778)
+ Size of smallest (>0)          
+                 65597   (65597)
+                   669     (669)
+               1183997 (1183997)
+----------------------------------------------------------------------
+
+
+Risk measures:
+
+Number of observations with higher risk than the main part of the data: 111
+Expected number of re-identifications: 161.63 (0.00 %)
+
+
+k-anon violations ( 0 ) for k=( 5 ) and quasi-identifiers ( race_ethnicity_combined sex age_group ). If greater than zero violations, then here's 5 violations.
+
+checking l-diversity manually for < pos_spec_dt >, found < 0 > l-diversity violations.
+[1] race_ethnicity_combined sex                     age_group              
+[4] pos_spec_dt             fk                      ldiv                   
+<0 rows> (or 0-length row.names)
+
+```

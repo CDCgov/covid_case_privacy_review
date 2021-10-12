@@ -7,7 +7,7 @@ library(arrow)
 out_dir = "../output"
 data_dir = "../data/raw"
 
-in_file_name <- "public_county_geography_2020-03-22.parquet"
+in_file_name <- "public_county_geography_2021-10-12.parquet"
 out_file_name <- sub(".parquet",".csv",in_file_name)
 
 in_file_name <- paste0(data_dir,"/",in_file_name)
