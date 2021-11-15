@@ -50,7 +50,7 @@ linked_attributes = list(
   )
 
 #if I use a CSV then there's logic to change down below
-file_name <- "public_county_geography_2021-08-03.parquet"
+file_name <- "public_county_geography_2021-11-09.parquet"
 suppressed_file_name = paste(out_dir,"/",file_name,".suppressed.csv",sep="")
 detailed_file_name = paste(data_dir,"/",file_name,sep="")
 print(detailed_file_name)
@@ -60,6 +60,10 @@ df = read_parquet(detailed_file_name, as_data_frame = TRUE)
 #df = read_parquet_parts(detailed_file_name) #
 #for some reason the dataframe from arrow makes sdc take forever and error, but if I make a new dataframe it works, todo figure it out
 data <- data.frame(df)
+
+save(df, file = "Geo_df.Rdata")
+remove(df)
+
 
 #summarize dataset
 result <- quick_summary(data, label="all_fields", qis=quasi_identifiers)
@@ -125,18 +129,24 @@ cat("\n\nWriting out a privacy eval report to:", paste(report_dir,"/",file_name,
 report(sdcObj, outdir = report_dir, filename = file_name,
        title = "SRRG Privacy Evaluation Report for Case Surveillance Public Data Set with Geography", internal = TRUE, verbose = FALSE)
 
+save(sdcObj, file = "Geo_sdcObj.Rdata")
+remove(sdcObj)
+
+save(data, file = "Geo_data.Rdata")
+remove(data)
+
 cat('Processing check for low population counties (rule #3), should be 0.\n')
 
 #weird way to read in a file to support utf characters in dataset #TODO fix
 fileIn=file(COUNTY_POP_FILE_NAME,open="rb",encoding="UTF-8-BOM")
 lines = readLines(fileIn)
-county_data = read.csv(text=lines, na.strings=c('NA',''), colClasses=c("state_county_combined_fips"="character"))
+county_data = read.csv(text=lines, na.strings=c('NA',''), colClasses=c("ï..state_county_combined_fips"="character"))
 
 #county_data = read.csv(COUNTY_POP_FILE_NAME, fileEncoding="UTF-8-BOM", na.strings=c('NA',''),colClasses=c("state_county_combined_fips"="character"))
+names(county_data)[names(county_data) == 'ï..state_county_combined_fips'] <- 'county_fips_code'
 names(county_data)[names(county_data) == 'state_county_combined_fips'] <- 'county_fips_code'
 names(county_data) <- tolower(names(county_data))
 county_data['state_abbr'] = state.abb[match(county_data$stname,state.name)]
-
 data_with_census = merge(x=data_na, y=county_data, by = 'county_fips_code', all.x = TRUE)
 
 #if I screw up the merge, that's bad
@@ -152,6 +162,9 @@ if (num_v > 0){
   print(unique(violations$res_county))
   print(violations[sample(num_v,min(num_v,5)),c(quasi_identifiers, 'sum_of_tot_pop')])
 }
+
+save(data_na, file = "Geo_data_na.Rdata")
+remove(data_na)
 
 #basically my logic here for rule #4 is that any county's population by sex, race, and/or ethnicity should be greater than or equal to 220. So I'll check each record that's not NA
 cat('\n\nProcessing check for low subpopulation demographics in counties (rule #4), should be 0, twice.\n')
@@ -201,6 +214,11 @@ cat("Subpopulation population too small for cases (",num_v,"). If greater than z
 if (num_v > 0){
   print(violations[sample(num_v,min(num_v,5)),])
 }
+
+save(data_with_census_case, file = "Geo_data_with_census_case.Rdata")
+remove(data_with_census_case)
+
+load(file = "Geo_data.Rdata")
 
 cat('\n\nProcessing check for county/state complementary offsets (rule #10), should be 0.\n')
 
