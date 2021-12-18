@@ -2835,4 +2835,184 @@ checking l-diversity manually for < pos_spec_dt >, found < 0 > l-diversity viola
 [1] race_ethnicity_combined sex                     age_group               pos_spec_dt            
 [5] fk                      ldiv                   
 <0 rows> (or 0-length row.names)
-'''
+```
+
+## 2021-12-14
+
+[DataExplorer Profile Report](../reports/COVID_Cases_Public_Limited_2021-12-14_parquet_profile.html)
+
+```
+[1] "C:/Users/rwe4/OneDrive - CDC/R_projects/covid_case_privacy_review/R"
+
+[1] "Quick summary:"
+                  all_fields  quasi_fields
+total_fields      12          3           
+total_records     40,314,956  40,314,956  
+total_cells       483,779,472 120,944,868 
+missing_fields    103,802,764 1,396,279   
+missing_pct       21%         1%          
+complete_fields   379,976,708 119,548,589 
+complete_pct      79%         99%         
+unknown_fields    30,734,448  12,761,844  
+unknown_pct       6%          11%         
+suppressed_fields 113         113         
+suppressed_pct    0%          0%          
+available_fields  349,242,147 106,786,632 
+available_pct     72%         88%         
+
+Utility summary:
+Total records in dataset: 40,314,956 
+                        suppressed suppressed_percent   missing missing_percent
+race_ethnicity_combined         10               0.0%   938,496            2.3%
+sex                             17               0.0%    79,693            0.2%
+age_group                       86               0.0%   378,090            0.9%
+records_with_any_field          86               0.0% 1,303,269            3.2%
+
+SDC summary for k-anon-level( 5 ).
+The input dataset consists of 40314956 rows and 12 variables.
+  --> Categorical key variables: race_ethnicity_combined, sex, age_group
+----------------------------------------------------------------------
+
+
+Information on categorical key variables:
+
+Reported is the number, mean size and size of the smallest category >0 for recoded variables.
+In parenthesis, the same statistics are shown for the unmodified data.
+Note: NA (missings) are counted as seperate categories!
+
+
+            Key Variable Number of categories         Mean size                Size of smallest (>0)          
+ race_ethnicity_combined                    8  (8)  3857554.429  (3857554.429)                 82563   (82563)
+                     sex                    4  (4) 13282323.667 (13282323.667)                   802     (802)
+               age_group                   10 (10)  4437420.000  (4437420.000)               1364302 (1364302)
+----------------------------------------------------------------------
+
+
+Risk measures:
+
+Number of observations with higher risk than the main part of the data: 92
+Expected number of re-identifications: 161.58 (0.00 %)
+
+k-anon violations ( 0 ) for k=( 5 ) and quasi-identifiers ( race_ethnicity_combined sex age_group ). If greater than zero violations, then here's 5 violations.
+
+checking l-diversity manually for < pos_spec_dt >, found < 0 > l-diversity violations.
+[1] race_ethnicity_combined sex                     age_group               pos_spec_dt            
+[5] fk                      ldiv                   
+<0 rows> (or 0-length row.names)
+```
+## 2021-12-14 Public Geo
+
+[DataExplorer Profile](../reports/public_county_geography_2021-12-14_profile.html)
+
+```
+[1] "C:/Users/rwe4/OneDrive - CDC/R_projects/covid_case_privacy_review/R"
+
+[1] "Quick summary:"
+                  all_fields  quasi_fields
+total_fields      19          8           
+total_records     40,314,956  40,314,956  
+total_cells       765,984,164 322,519,648 
+missing_fields    166,493,514 24,271,942  
+missing_pct       22%         8%          
+complete_fields   599,490,650 298,247,706 
+complete_pct      78%         92%         
+unknown_fields    33,354,832  18,328,928  
+unknown_pct       4%          6%          
+suppressed_fields 22,720,880  19,914,174  
+suppressed_pct    3%          6%          
+available_fields  543,414,938 260,004,604 
+available_pct     71%         81%         
+
+Utility summary:
+Total records in dataset: 40,314,956 
+                       suppressed suppressed_percent    missing missing_percent
+case_month                     12               0.0%          0            0.0%
+res_state                     944               0.0%          0            0.0%
+res_county              2,805,762               7.0%          0            0.0%
+age_group                 437,950               1.1%    361,336            0.9%
+sex                     1,217,395               3.0%     47,098            0.1%
+race                    6,186,258              15.3%  2,804,444            7.0%
+ethnicity               7,377,166              18.3%  2,392,743            5.9%
+death_yn                1,888,687               4.7% 18,666,321           46.3%
+records_with_any_field 10,819,870              26.8% 19,734,757           49.0%
+
+Processing checks for linked fields ( res_state county_fips_code state_fips_code res_county res_county county_fips_code )
+linked variable violations ( 0 ) for source_field=( res_state ) and linked_field=( county_fips_code ). If greater than zero violations, then here's 5 violations.
+
+
+linked variable violations ( 0 ) for source_field=( res_state ) and linked_field=( state_fips_code ). If greater than zero violations, then here's 5 violations.
+
+
+linked variable violations ( 0 ) for source_field=( res_state ) and linked_field=( res_county ). If greater than zero violations, then here's 5 violations.
+
+
+linked variable violations ( 0 ) for source_field=( res_county ) and linked_field=( county_fips_code ). If greater than zero violations, then here's 5 violations.
+
+SDC summary for k-anon-level( 1000 ).
+The input dataset consists of 40314956 rows and 19 variables.
+  --> Categorical key variables: res_state, res_county
+----------------------------------------------------------------------
+
+
+Information on categorical key variables:
+
+Reported is the number, mean size and size of the smallest category >0 for recoded variables.
+In parenthesis, the same statistics are shown for the unmodified data.
+Note: NA (missings) are counted as seperate categories!
+
+
+ Key Variable Number of categories         Mean size              Size of smallest (>0)       
+    res_state                   55   (55) 746555.778 (746555.778)                  6886 (6886)
+   res_county                 1070 (1070)  35088.114  (35088.114)                  1034 (1034)
+----------------------------------------------------------------------
+
+
+Risk measures:
+
+Number of observations with higher risk than the main part of the data: 0
+Expected number of re-identifications: 1611.47 (0.00 %)
+
+k-anon violations ( 0 ) for k=( 1000 ) and quasi-identifiers ( res_state res_county ). If greater than zero violations, then here's 5 violations.
+
+SDC summary for k-anon-level( 11 ).
+The input dataset consists of 40314956 rows and 19 variables.
+  --> Categorical key variables: case_month, res_state, res_county, age_group, sex, race, ethnicity, death_yn
+----------------------------------------------------------------------
+
+
+Information on categorical key variables:
+
+Reported is the number, mean size and size of the smallest category >0 for recoded variables.
+In parenthesis, the same statistics are shown for the unmodified data.
+Note: NA (missings) are counted as seperate categories!
+
+
+ Key Variable Number of categories           Mean size                Size of smallest (>0)          
+   case_month                   24   (24)  1752823.652  (1752823.652)                  3912    (3912)
+    res_state                   55   (55)   746555.778   (746555.778)                  6886    (6886)
+   res_county                 1070 (1070)    35088.114    (35088.114)                  1034    (1034)
+    age_group                    5    (5)  9878917.500  (9878917.500)               4955749 (4955749)
+          sex                    4    (4) 12919833.000 (12919833.000)                    12      (12)
+         race                    7    (7)  4326800.500  (4326800.500)                 56897   (56897)
+    ethnicity                    3    (3) 11411419.500 (11411419.500)               3490749 (3490749)
+     death_yn                    3    (3)  7403821.500  (7403821.500)                350973  (350973)
+----------------------------------------------------------------------
+
+
+Risk measures:
+
+Number of observations with higher risk than the main part of the data: 0
+Expected number of re-identifications: 43270.26 (0.11 %)
+
+k-anon violations ( 0 ) for k=( 11 ) and quasi-identifiers ( case_month res_state res_county age_group sex race ethnicity death_yn ). If greater than zero violations, then here's 5 violations.
+
+Low population county violations ( 0 ). If greater than zero violations, then the list of counties with violations and 5 sample violations.
+
+Subpopulation county violations, part 1 checking subpopulation for counties ( 0 ). If greater than zero violations, then here's 5 sample violations.
+
+Subpopulation county violations, part 2, checking to make sure there aren't any res_county that aren't NA but have subpops ( 0 ). If greater than zero violations, then here's 5 sample violations.
+
+Subpopulation population too small for cases ( 0 ). If greater than zero violations, then here's 5 sample violations.
+
+County/state complementary violations ( 0 ). If greater than zero violations, then here's states with violations.
+```
