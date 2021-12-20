@@ -30,11 +30,7 @@ library(arrow)
 library(flextable)
 data_dir = "../data/raw"
 
-<<<<<<< HEAD
 file_name <- list.files(data_dir, "public_county_geography")
-=======
-file_name <- list.files('data/raw', "public_county_geography")
->>>>>>> 95f08d2cb91e70c22ee3621219e37130e311107c
 detailed_file_name = paste(data_dir,"/",file_name,sep="")
 
 #change me to whatever version you want to display
