@@ -32,7 +32,6 @@ library(flextable)
 data_dir = "../data/raw"
 
 file_name <- list.files(data_dir, "COVID_Cases_Public_Limited")
-
 detailed_file_name = paste(data_dir,"/",file_name,sep="")
 
 #change me to whatever version you want to display
