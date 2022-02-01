@@ -3558,3 +3558,50 @@ Subpopulation population too small for cases ( 0 ). If greater than zero violati
 Processing check for county/state complementary offsets (rule #10), should be 0.
 County/state complementary violations ( 0 ). If greater than zero violations, then here's states with violations.
 ```
+
+## 2022-01-24
+
+[DataExplorer Profile Report](../reports/COVID_Cases_Public_Limited_2022-01-24_parquet_profile.html)
+
+
+```[1] "covid_case_privacy_review/data/raw/COVID_Cases_Public_Limited_20220124.parquet"
+SDC summary for k-anon-level( 5 ).
+The input dataset consists of 51447566 rows and 12 variables.
+  --> Categorical key variables: race_ethnicity_combined, sex, age_group
+----------------------------------------------------------------------
+
+
+Information on categorical key variables:
+
+Reported is the number, mean size and size of the smallest category >0 for recoded variables.
+In parenthesis, the same statistics are shown for the unmodified data.
+Note: NA (missings) are counted as seperate categories!
+
+
+            Key Variable Number of categories         Mean size               
+ race_ethnicity_combined                    8  (8)  4889174.429  (4889174.429)
+                     sex                    4  (4) 16911640.667 (16911640.667)
+               age_group                   10 (10)  5659981.111  (5659981.111)
+ Size of smallest (>0)          
+                104000  (104000)
+                   704     (704)
+               1569792 (1569792)
+----------------------------------------------------------------------
+
+
+Risk measures:
+
+Number of observations with higher risk than the main part of the data: 66
+Expected number of re-identifications: 156.92 (0.00 %)
+
+k-anon violations ( 0 ) for k=( 5 ) and quasi-identifiers ( race_ethnicity_combined sex age_group ). If greater than zero violations, then here's 5 violations.
+
+
+Writing out a privacy eval report to: covid_case_privacy_review/reports/COVID_Cases_Public_Limited_20220124.parquet.html 
+
+Processing l-diversity ( 2 ) checks for < covid_case_privacy_review/data/raw/COVID_Cases_Public_Limited_20220124.parquet > that has < > records; < 12 > variables; < 3 > quasi-identifiers ( race_ethnicity_combined sex age_group ); and < 1 > confidential attributes ( pos_spec_dt ).
+checking l-diversity manually for < pos_spec_dt >, found < 0 > l-diversity violations.
+[1] race_ethnicity_combined sex                     age_group              
+[4] pos_spec_dt             fk                      ldiv                   
+<0 rows> (or 0-length row.names)
+```
