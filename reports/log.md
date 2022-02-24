@@ -3722,3 +3722,52 @@ Subpopulation population too small for cases ( 0 ). If greater than zero violati
 
 County/state complementary violations ( 0 ). If greater than zero violations, then here's states with violations.
 ```
+
+## 2022-02-18
+
+[DataExplorer Profile Report](../reports/COVID_Cases_Public_Limited_2022-02-18_parquet_profile.html)
+
+```
+[1] "covid_case_privacy_review/data/raw/COVID_Cases_Public_Limited_20220218.parquet"
+SDC summary for k-anon-level( 5 ).
+The input dataset consists of 61267087 rows and 12 variables.
+  --> Categorical key variables: race_ethnicity_combined, sex, age_group
+----------------------------------------------------------------------
+
+
+Information on categorical key variables:
+
+Reported is the number, mean size and size of the smallest category >0 for recoded variables.
+In parenthesis, the same statistics are shown for the unmodified data.
+Note: NA (missings) are counted as seperate categories!
+
+
+            Key Variable Number of categories         Mean size                Size of smallest (>0)          
+ race_ethnicity_combined                    8  (8)  5756116.571  (5756116.571)                122264  (122264)
+                     sex                    4  (4) 20067937.000 (20067937.000)                  1420    (1420)
+               age_group                   10 (10)  6726995.000  (6726995.000)               1787735 (1787735)
+----------------------------------------------------------------------
+
+
+Risk measures:
+
+Number of observations with higher risk than the main part of the data: 43
+Expected number of re-identifications: 164.69 (0.00 %)
+
+k-anon violations ( 0 ) for k=( 5 ) and quasi-identifiers ( race_ethnicity_combined sex age_group ). If greater than zero violations, then here's 5 violations.
+
+
+Writing out a privacy eval report to: covid_case_privacy_review/reports/COVID_Cases_Public_Limited_20220218.parquet.html 
+
+Processing l-diversity ( 2 ) checks for < covid_case_privacy_review/data/raw/COVID_Cases_Public_Limited_20220218.parquet > that has < > records; < 12 > variables; < 3 > quasi-identifiers ( race_ethnicity_combined sex age_group ); and < 1 > confidential attributes ( pos_spec_dt ).
+checking l-diversity manually for < pos_spec_dt >, found < 0 > l-diversity violations.
+[1] race_ethnicity_combined sex                     age_group               pos_spec_dt            
+[5] fk                      ldiv                   
+<0 rows> (or 0-length row.names)
+```
+
+## 2022-02-18 Public Geo
+
+[DataExplorer Profile](../reports/public_county_geography_2022-02-18_profile.html)
+
+```
