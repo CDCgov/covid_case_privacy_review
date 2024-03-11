@@ -7771,3 +7771,169 @@ Processing check for county/state complementary offsets (rule #10), should be 0.
 
 Subpopulation population too small for cases (0). If greater than zero violations, then here's 5 sample violations.
 ```
+
+## 2024-03-07
+
+[DataExplorer Profile](../reports/COVID_Cases_Public_Limited_20240307_parquet_profile.pdf)
+
+```
+Existing Suppression Summary:
+                         na_count  na_percent
+race_ethnicity_combined  34286601    0.325359
+sex                       1528101    0.014501
+age_group                 1113436    0.010566
+
+
+SDC Summary for k-anon-level(5)
+The input dataset consists of 105380721 rows and 12 variables
+  --> Categorical key variables: 
+['race_ethnicity_combined', 'sex', 'age_group']
+-----------------------------------------------
+
+Information on categorical key variables: 
+Reported is the number, mean size and size of the smallest category >0 for recoded variables.
+In parenthesis, the same statistics are shown for the unmodified data.
+Note: NA (missings) are counted as seperate categories!
+              Key Variable  Number of Categories     Mean Size  Size of Smallest (>0)
+0  race_ethnicity_combined                     8  1.317259e+07                 194140
+1                      sex                     4  2.634518e+07                   4750
+2                age_group                    10  1.053807e+07                1113436
+-----------------------------------------------
+
+k-anon violations (0) for k=(5) and quasi-identifiers (
+['race_ethnicity_combined', 'sex', 'age_group']
+). If greater than zero violations, then here are the queries which led to violations.
+
+Processing l-diversity (2) checks for COVID_Cases_Public_Limited that has <105380721> records; <12> variables; <3> quasi-identifiers (
+['race_ethnicity_combined', 'sex', 'age_group']
+); and <1> confidential attributes (
+['pos_spec_dt']
+).
+Checking l-diversity manually for <pos_spec_dt>,
+found <0> l-diversity violations.
+```
+
+## 2024-03-07 Public Geo
+
+[DataExplorer Profile](../reports/public_county_geography_2024-03-07_profile.pdf)
+
+```
+Quick Summary: 
+                   all_fields quasi_fields
+total_fields        105380721    105380721
+total_records              19            8
+total_cells        2002233699    843045768
+missing_fields      462478596     71993230
+missing_pct             23.1%         8.5%
+complete_fields    1539755103    771052538
+complete_pct            76.9%        91.5%
+unknown_fields       93930320     46775222
+unknown_pct              4.7%         5.5%
+suppressed_fields    59109867     51606160
+suppressed_pct           3.0%         6.1%
+available_fields   1386714916    672671156
+available_pct           69.3%        79.8%
+
+
+Utility Summary: 
+Total Records in the dataset: 105380721
+     variable  suppressed suppressed_percent   missing missing_percent
+0  case_month          12               0.0%         0            0.0%
+1   res_state        1813               0.0%         0            0.0%
+2  res_county     7501894               7.1%         0            0.0%
+3   age_group     1102081               1.0%   1070779            1.0%
+4         sex     3442166               3.3%    423055            0.4%
+5        race    17036049              16.2%   7998559            7.6%
+6   ethnicity    19111853              18.1%   6374905            6.0%
+7    death_yn     3410292               3.2%  56125932           53.3%
+
+
+Processing checks for linked fields (
+[['res_state', ['county_fips_code', 'state_fips_code', 'res_county']], ['res_county', ['county_fips_code']]]
+)
+
+linked variable violations (0) for source_field=(res_state) and linked_field=(county_fips_code). If greater than zero violations, then here's 5 violations.
+
+linked variable violations (0) for source_field=(res_state) and linked_field=(state_fips_code). If greater than zero violations, then here's 5 violations.
+
+linked variable violations (0) for source_field=(res_state) and linked_field=(res_county). If greater than zero violations, then here's 5 violations.
+
+linked variable violations (0) for source_field=(res_county) and linked_field=(county_fips_code). If greater than zero violations, then here's 5 violations.
+
+
+
+Processing check for states and counties having at least 1,000 cases (rules #1,2), should be 0.
+
+SDC summary for k-anon-level(1000)
+The input dataset consists of 105380721 rows and 19 variables.
+  --> Categorical key variables: 
+['res_state', 'res_county']
+-----------------------------------------------
+
+Information on categorical key variables: 
+Reported is the number, mean size and size of the smallest category >0 for recoded variables.
+In parenthesis, the same statistics are shown for the unmodified data.
+Note: NA (missings) are counted as seperate categories!
+  Key Variable  Number of Categories     Mean Size  Size of Smallest (>0)
+0    res_state                    55  1.916013e+06                   1813
+1   res_county                  1187  8.877904e+04                   1723
+-----------------------------------------------
+
+-----------------------------------------------
+
+k-anon violations (0) for k=(1000) and quasi-identifiers (
+['res_state', 'res_county']
+). If greater than zero violations, then here are the queries which led to violations.
+
+
+
+Processing check for k-anonymity 11 across all quasi-identifiers (rule #6), should be 0.
+
+SDC summary for k-anon-level(11)
+The input dataset consists of 105380721 rows and 19 variables.
+  --> Categorical key variables: 
+['case_month', 'res_state', 'res_county', 'age_group', 'sex', 'race', 'ethnicity', 'death_yn']
+-----------------------------------------------
+
+Information on categorical key variables: 
+Reported is the number, mean size and size of the smallest category >0 for recoded variables.
+In parenthesis, the same statistics are shown for the unmodified data.
+Note: NA (missings) are counted as seperate categories!
+  Key Variable  Number of Categories     Mean Size  Size of Smallest (>0)
+0   case_month                    51  2.066289e+06                     12
+1    res_state                    55  1.916013e+06                   1813
+2   res_county                  1187  8.877904e+04                   1723
+3    age_group                     5  2.107614e+07                2172860
+4          sex                     4  2.634518e+07                   1571
+5         race                     7  1.505439e+07                  91011
+6    ethnicity                     3  3.512691e+07                9950747
+7     death_yn                     3  3.512691e+07                 467306
+-----------------------------------------------
+
+-----------------------------------------------
+
+k-anon violations (0) for k=(11) and quasi-identifiers (
+['case_month', 'res_state', 'res_county', 'age_group', 'sex', 'race', 'ethnicity', 'death_yn']
+). If greater than zero violations, then here are the queries which led to violations.
+
+Print False if any rows were dropped during the merge:
+True
+Low population county violations (0). If greater than zero violations, then the list of counties with violations and 5 sample violations.
+
+
+
+Processing check for low subpopulation demographics in counties (rule #4), should be 0, twice.
+
+Subpopulation county violations, part 1 checking subpopulation for counties (0). If greater than zero violations, then here's 5 sample violations.
+
+Subpopulation county violations, part 2, checking to make sure there aren't any res_county that aren't NA but have subpops (0). If greater than zero violations, then here's 5 sample violations.
+
+Print False if any rows were dropped during the merge: 
+True
+Subpopulation population too small for cases (0). If greater than zero violations, then here's 5 sample violations.
+
+
+Processing check for county/state complementary offsets (rule #10), should be 0.
+
+Subpopulation population too small for cases (0). If greater than zero violations, then here's 5 sample violations.
+```
